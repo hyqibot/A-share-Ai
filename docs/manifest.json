@@ -1,0 +1,10 @@
+{
+  "name": "AI交易系统",
+  "short_name": "AI交易",
+  "start_url": "/web/dashboard.html",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#58a6ff",
+  "icons": []
+}
+

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易历史与持仓分析</title>
+    <script src="config.js"></script>
+    <script src="js/cache-helper.js"></script>
+    <script src="js/sw-helper.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #21262d;
+        }
+        .header h1 {
+            color: #f0f6fc;
+            font-size: 28px;
+        }
+        .header-nav {
+            display: flex;
+            gap: 24px;
+        }
+        .header-nav a {
+            color: #8b949e;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 20px;
+        }
+        .header-nav a:hover, .header-nav a.active {
+            color: #f0883e;
+        }
+        .filters {
+            background: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #21262d;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-group label {
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+        .filter-group select, .filter-group input {
+            padding: 8px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+        .filter-group button {
+            padding: 8px 20px;
+            background: #238636;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .filter-group button:hover {
+            background: #2ea043;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #21262d;
+        }
+        th {
+            background: #0d1117;
+            color: #58a6ff;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #1c2128;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge.buy {
+            background: #238636;
+            color: #fff;
+        }
+        .badge.sell {
+            background: #da3633;
+            color: #fff;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b949e;
+        }
+        .error {
+            color: #da3633;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>交易历史与持仓分析</h1>
+        <div class="header-nav">
+            <a href="index.html">实时收益及决策日志</a>
+            <a href="portfolio.html" class="active">AI投资组合</a>
+        </div>
+    </div>
+
+    <div class="filters">
+        <div class="filter-group">
+            <label>模型:</label>
+            <select id="modelFilter">
+                <option value="">所有模型</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>开始日期:</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="filter-group">
+            <label>结束日期:</label>
+            <input type="date" id="endDate">
+        </div>
+        <div class="filter-group">
+            <button onclick="loadData()">刷新数据</button>
+        </div>
+    </div>
+
+    <div id="content" class="loading">加载中...</div>
+
+    <script src="js/portfolio.js"></script>
+</body>
+</html>
+

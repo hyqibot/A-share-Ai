@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai-A股交易机器 A-share AI</title>
+    <script src="config.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+            transform: scale(0.8);  
+            transform-origin: top left;
+            width: 125%;
+            height: 125%;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-shrink: 0;
+        }
+        .header h1 {
+            text-align: left;
+            margin: 0;
+            font-size: 26px;
+        }
+        .header-nav {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex: 1;
+        }
+        .header-nav a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 20px;
+        }
+        .header-nav a:hover {
+            color: #764ba2;
+        }
+        .content-wrapper {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+        .left-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 0;
+        }
+        .right-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .chart-wrapper, .logs-container, .readme-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .chart-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 0;
+        }
+        .chart-wrapper h2 {
+            margin-top: 0;
+            flex-shrink: 0;
+        }
+        #performanceChart {
+            width: 100%;
+            height: 100%;
+            max-height: none;
+        }
+        .lazy-load-container {
+            flex: 1;
+            position: relative;
+            min-height: 0;
+        }
+        .logs-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+        .logs-container h2 {
+            margin-top: 0;
+            flex-shrink: 0;
+            text-align: left;
+        }
+        #logContainer {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            text-align: left;
+            min-height: 0;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .log-entry .timestamp {
+            color: #666;
+            margin-right: 10px;
+        }
+        .log-entry .level {
+            display: inline-block;
+            width: 70px;
+            text-align: center;
+            margin-right: 10px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .level.INFO { background-color: #d1ecf1; color: #0c5460; }
+        .level.WARNING { background-color: #fff3cd; color: #856404; }
+        .level.ERROR { background-color: #f8d7da; color: #721c24; }
+        
+        .readme-container {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+        }
+        .readme-container h1 {
+            font-size: 1.8em;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .readme-container h2 {
+            font-size: 1.4em;
+            color: #444;
+            margin-top: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        .readme-container h3 {
+            font-size: 1.2em;
+            color: #555;
+            margin-top: 20px;
+        }
+        .readme-container ul {
+            padding-left: 20px;
+        }
+        .readme-container li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .readme-container p {
+            line-height: 1.6;
+            color: #666;
+            margin: 10px 0;
+        }
+        .readme-container code {
+            background-color: #f8f8f8;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .readme-container blockquote {
+            border-left: 4px solid #ddd;
+            margin: 0;
+            padding: 0 15px;
+            color: #777;
+        }
+        .readme-container .email {
+            font-weight: bold;
+            color: #0066cc;
+        }
+        
+        .lazy-load-container {
+            position: relative;
+            min-height: 200px;
+        }
+        
+        .lazy-load-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #666;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ai-A股交易机器——接入真实账户，实现秒级交易；100% Ai自主决策，Ai自我发现、自我训练、自我进化</h1>
+            <div class="header-nav">
+                <a href="index.html">实时收益及决策日志</a>
+                <a href="portfolio.html">Ai投资组合（点击跳转）</a>
+            </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="left-column">
+                <div class="chart-wrapper">
+                    <h2>模型收益曲线（实时数据）
+                        <button id="toggleDataButton" style="float: right; margin-top: -5px; font-size: 14px;">显示全部数据</button>
+                    </h2>
+                    <div class="lazy-load-container" id="chartContainer">
+                        <div class="lazy-load-placeholder" id="chartPlaceholder">
+                            <div class="loading-spinner"></div>
+                            <p>正在加载图表...</p>
+                        </div>
+                        <canvas id="performanceChart" style="display: none; width: 100%; height: 100%;"></canvas>
+                    </div>
+                </div>
+                
+                <div class="readme-container">
+                    <h1>幻银量化Ai-A股交易机器 A-share AI</h1>
+
+                    <p>基于四大国内大模型（幻银超i、DeepSeek、通义千问、豆包）的A股自动交易系统，支持全市场选股和实盘交易。</p>
+
+                    <h2>功能特性</h2>
+
+                    <ul>
+                        <li><strong>真实交易账户</strong>：接入A股真实交易账户，并非象某trader那样只是使用真实市场数据模拟成交</li>
+                        <li><strong>秒级实盘交易</strong>：接入实盘秒级精度交易，实时展示ai真实交易过程</li>
+                        <li><strong>AI自主决策</strong>：100% AI自主决策，零人工干预，ai策略自我发现、自我训练、自我进化</li>
+                        <li><strong>可选实时干预</strong>：在交易过程中可添加实时人工干预和Ai进行互动（可选），适应大规模投资的真实场景</li>
+                        <li><strong>4大模型并行</strong>：幻银超i、DeepSeek、Qwen通义千问、豆包同时运行，比较收益</li>
+                        <li><strong>全市场选股</strong>：AI自主从全市场选择有潜力的股票</li>
+                        <li><strong>实时行情</strong>：集成实时A股数据，供ai使用并用于实际交易</li>
+                        <li><strong>历史行情+财务数据</strong>：集成A股历史行情和财务数据，供ai分析和训练</li>
+                        <li><strong>智能交易</strong>：基于AI分析生成买卖信号并全自动执行交易</li>
+                        <li><strong>多种策略</strong>：包括趋势跟踪、均线策略、技术指标策略、量化套利策略等，完全由ai自动选择并不断进化</li>
+                        <li><strong>实时监控</strong>：UI界面实时显示收益曲线和交易日志</li>
+                        <li><strong>风险控制</strong>：内置仓位控制和止损机制</li>
+                    </ul>
+
+                    <h2>安装使用</h2>
+
+                    <ol>
+                        <li><strong>安装</strong>
+                        稍晚将打包成桌面exe软件，可直接下载运行，提供长达3个月的免费试用，使用者提供反馈被采纳，将可获取专业的技术支持和长期使用权。预约邮箱：<span class="email">hyqi@tradey.dpdns.org</span>，发送您的联系方式和简短介绍，我们将尽快安排试用。</li>
+                    </ol>
+
+                    <h2>核心改进</h2>
+
+                    <p>核心改进：真正的AI自我发现</p>
+                    <ol>
+                        <li>从空白或使用者设定的风格开始</li>
+                    </ol>
+
+                    <p>所有AI初始可以都是"自适应投资者"</p>
+
+                    <p>也可以预设投资风格</p>
+
+                    <p>通过实践发现自己的特长</p>
+
+                    <h3>自我反思机制</h3>
+                    <p>定期回顾投资表现</p>
+
+                    <p>分析什么策略对自己有效</p>
+
+                    <p>主动调整投资哲学</p>
+
+                    <h3>风格进化</h3>
+                    <p>记录风格变化轨迹</p>
+
+                    <p>基于表现调整风险偏好</p>
+
+                    <p>逐步形成稳定的投资人格</p>
+
+                    <h3>真正的差异性</h3>
+                    <p>现在4个AI将：</p>
+
+                    <p>自主发现风格：DeepSeek可能发现自己擅长量化，Qwen可能偏好价值投资</p>
+
+                    <p>不同的进化路径：每个AI基于自身特质和市场反馈形成独特风格</p>
+
+                    <p>动态调整：根据市场环境变化调整策略</p>
+
+                    <p>真正的个性：发展出反映其"性格"的投资哲学</p>
+
+                    <h3>预期结果</h3>
+                    <p>您将看到：</p>
+
+                    <p>真正的AI个性：每个AI发展出独特的投资身份</p>
+
+                    <p>动态的风格进化：投资风格会随着经验积累而改变</p>
+
+                    <p>基于表现的调整：成功的策略被保留，失败的被淘汰</p>
+
+                    <p>不可预测的结果：无法预先知道哪个AI会发展出什么风格</p>
+
+                    <p>这样设计后，您将见证真正的"AI投资经理成长史"，而不是预先编排的表演。每个AI都有机会找到最适合自己的投资道路！</p>
+
+                    <blockquote>
+                    <p>A decade ago, DeepMind revolutionized AI research. Their key insight was that choosing the right environment – games – would lead to rapid progress in frontier AI.</p>
+
+                    <p>At HYQi, we believe financial markets are the best training environment for the next era of AI. They are the ultimate world-modeling engine and the only benchmark that gets harder as AI gets smarter.</p>
+
+                    <p>Instead of games, we're using financial markets in a live trading environment to train new base models that create their own training data indefinitely. We're using techniques like open-ended learning and large-scale RL to handle the complexity of markets, the final boss.</p>
+
+                    <p>If this resonates, we're hiring: engineers, researchers, founders, original thinkers.</p>
+
+                    <p>If you're excited to build AlphaHYQi for the real world, get in touch.</p>
+
+                    <p>"Capital allocation is the discipline through which intelligence converges with truth."</p>
+
+                    <p>A shared vision for the future. — HYQi</p>
+
+                    <p>十年前，DeepMind彻底改变了人工智能的研究范式。他们的核心洞见在于：选择正确的训练环境——游戏——将推动前沿人工智能的快速突破。</p>
+
+                    <p>在HYQi，我们相信金融市场是下一代人工智能的最佳训练场。它是世界级别模型引擎的终极形态，也是唯一会随着AI智能提升而不断升级难度的标杆。</p>
+
+                    <p>我们正以真实交易环境的金融市场替代游戏，训练能够持续自我生成数据的新型基础模型。面对市场这个"终极挑战"，我们运用开放式学习、大规模强化学习等技术来驾驭其复杂性。</p>
+
+                    <p>心怀此念，我们正广纳贤才，招募工程师、研究员、创业伙伴与思维破局者。</p>
+
+                    <p>如果您渴望为现实世界打造Alpha-HYQi，欢迎与我们携手。</p>
+
+                    <p>"资本配置，是智慧接受真理检验的试金石"。</p>
+
+                    <p>———幻银超i与您共勉</p>
+                    </blockquote>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="logs-container">
+                    <h2>运行日志</h2>
+                    <div id="logContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 从配置获取 API 地址
+        // 注意：Tailscale Funnel URL 格式通常是 https://xxx.ts.net（已包含端口映射）
+        const API_BASE = window.API_CONFIG ? window.API_CONFIG.baseUrl : 'http://localhost:4000';
+        
+        // Socket.IO 服务器地址
+        // Tailscale Funnel 通过 HTTPS 暴露 4000 端口，Socket.IO 会自动使用 WSS（WebSocket Secure）
+        let SOCKET_URL = API_BASE;
+        if (!SOCKET_URL.startsWith('http')) {
+            // 如果 URL 没有协议，添加 http://
+            SOCKET_URL = `http://${SOCKET_URL}`;
+        }
+        
+        // 检查是否是 Tailscale Funnel URL（.ts.net 域名）
+        const isTailscaleFunnel = SOCKET_URL.includes('.ts.net');
+        const isLocalhost = SOCKET_URL.includes('localhost') || SOCKET_URL.includes('127.0.0.1');
+        
+        console.log('🔧 API 配置:', {
+            API_BASE: API_BASE,
+            SOCKET_URL: SOCKET_URL,
+            isTailscaleFunnel: isTailscaleFunnel,
+            isLocalhost: isLocalhost
+        });
+        
+        // 初始化SocketIO连接（如果可用）
+        // Tailscale Funnel 支持 WebSocket，可以实现实时推送
+        let socket = null;
+        let useSocketIO = false;
+        
+        try {
+            // Socket.IO 库可用且不是本地地址时，尝试连接
+            if (typeof io !== 'undefined' && !isLocalhost) {
+                console.log('🚀 尝试连接 Socket.IO 服务器:', SOCKET_URL);
+                
+                socket = io(SOCKET_URL, {
+                    reconnection: true,
+                    reconnectionDelay: 1000,
+                    reconnectionDelayMax: 5000,
+                    reconnectionAttempts: 10, // Tailscale 可能需要更多重试
+                    transports: ['websocket', 'polling'], // 优先 WebSocket，失败时降级到 polling
+                    timeout: 10000, // Tailscale 可能需要更长的超时
+                    autoConnect: true,
+                    forceNew: false,
+                    // 对于 HTTPS/WSS，确保正确处理证书
+                    rejectUnauthorized: false // Tailscale 使用自签名证书时需要
+                });
+                
+                // 连接成功
+                socket.on('connect', () => {
+                    useSocketIO = true;
+                    console.log('✅ Socket.IO 连接成功！');
+                    console.log('   - 服务器地址:', SOCKET_URL);
+                    console.log('   - 传输方式:', socket.io.engine.transport.name);
+                    console.log('   - 使用实时推送模式');
+                });
+                
+                // 连接失败
+                socket.on('connect_error', (error) => {
+                    useSocketIO = false;
+                    console.warn('⚠️ Socket.IO 连接失败，降级到 HTTP 轮询模式');
+                    console.warn('   错误信息:', error.message);
+                    console.warn('   将继续使用 HTTP 轮询获取数据');
+                });
+                
+                // 断开连接
+                socket.on('disconnect', (reason) => {
+                    useSocketIO = false;
+                    console.warn('⚠️ Socket.IO 断开连接:', reason);
+                    console.warn('   将切换到 HTTP 轮询模式');
+                });
+                
+                // 接收服务器确认
+                socket.on('connection_success', (data) => {
+                    console.log('✅ 服务器确认连接:', data);
+                });
+                
+                // 接收性能数据更新
+                socket.on('performance_update', (data) => {
+                    if (chart) {
+                        updatePerformanceChart(chart, data);
+                    }
+                });
+                
+                // 接收日志更新
+                socket.on('new_log', (data) => {
+                    const logContainer = document.getElementById('logContainer');
+                    if (logContainer) {
+                        addLogEntry(logContainer, data);
+                    }
+                });
+            } else if (isLocalhost) {
+                console.log('ℹ️ 检测到本地地址，Socket.IO 将连接到本地服务器');
+                // 本地环境也尝试连接
+                socket = io(SOCKET_URL, {
+                    reconnection: true,
+                    transports: ['websocket', 'polling']
+                });
+                socket.on('connect', () => {
+                    useSocketIO = true;
+                    console.log('✅ 本地 Socket.IO 连接成功');
+                });
+                socket.on('connect_error', () => {
+                    useSocketIO = false;
+                    console.warn('⚠️ 本地 Socket.IO 连接失败，使用 HTTP 轮询');
+                });
+            } else {
+                console.log('ℹ️ Socket.IO 库未加载，使用 HTTP 轮询模式');
+            }
+        } catch (e) {
+            console.warn('⚠️ Socket.IO 初始化失败，使用 HTTP 轮询模式:', e.message);
+        }
+        
+        // 等待Chart.js加载完成后再初始化图表
+        function initChart() {
+            if (typeof Chart === 'undefined') {
+                console.log('Chart.js未加载完成，等待中...');
+                setTimeout(initChart, 1000);
+                return;
+            }
+            
+            console.log('Chart.js已加载，初始化图表');
+            
+            // 初始化图表
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '时间',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: '累计收益率 (%)',
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            ticks: {
+                                precision: 2,
+                                callback: function(value) {
+                                    return value.toFixed(2) + '%';
+                                }
+                            },
+                            beginAtZero: false,
+                            grace: '10%'
+                        }
+                    },
+                    animation: {
+                        duration: 500
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'AI模型收益率对比',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    elements: {
+                        line: {
+                            tension: 0.4,
+                            borderWidth: 2
+                        },
+                        point: {
+                            radius: 4,
+                            hoverRadius: 6
+                        }
+                    }
+                }
+            });
+            
+            // 显示图表并隐藏加载提示
+            document.getElementById('chartPlaceholder').style.display = 'none';
+            document.getElementById('performanceChart').style.display = 'block';
+            
+            return chart;
+        }
+        
+        // 初始化日志容器
+        function initLogContainer() {
+            const logContainer = document.getElementById('logContainer');
+            return logContainer;
+        }
+        
+        // 添加日志条目
+        function addLogEntry(logContainer, logEntry) {
+            try {
+                const logDiv = document.createElement('div');
+                logDiv.className = 'log-entry';
+                
+                const timestamp = logEntry.timestamp || new Date().toISOString();
+                const level = logEntry.level || 'INFO';
+                const message = logEntry.message || '';
+                
+                logDiv.innerHTML = `
+                    <span class="timestamp">${timestamp}</span>
+                    <span class="level ${level}">${level}</span>
+                    <span class="message">${message}</span>
+                `;
+                logContainer.appendChild(logDiv);
+                logContainer.scrollTop = logContainer.scrollHeight;
+                
+                // 限制日志数量
+                if (logContainer.children.length > 500) {
+                    logContainer.removeChild(logContainer.firstChild);
+                }
+            } catch (error) {
+                console.error('Error adding log entry:', error);
+            }
+        }
+        
+        // 更新性能图表
+        function updatePerformanceChart(chart, data) {
+            if (!chart || !data) return;
+            
+            // 清空现有数据
+            chart.data.labels = [];
+            chart.data.datasets = [];
+            
+            // 为每个模型创建数据集
+            const colors = [
+                'rgb(255, 99, 132)',
+                'rgb(54, 162, 235)',
+                'rgb(255, 205, 86)',
+                'rgb(75, 192, 192)',
+                'rgb(153, 102, 255)',
+                'rgb(255, 159, 64)'
+            ];
+            
+            let colorIndex = 0;
+            let allTimes = [];
+            
+            // 收集所有时间点
+            for (const [modelName, modelData] of Object.entries(data)) {
+                if (modelData && Array.isArray(modelData)) {
+                    modelData.forEach(point => {
+                        if (point.time && !allTimes.includes(point.time)) {
+                            allTimes.push(point.time);
+                        }
+                    });
+                }
+            }
+            
+            // 按时间排序
+            allTimes.sort();
+            
+            // 提取时间标签（只显示时间部分）
+            const timeLabels = allTimes.map(timeStr => {
+                const date = new Date(timeStr);
+                return date.toLocaleTimeString();
+            });
+            
+            chart.data.labels = timeLabels;
+            
+            // 为每个模型创建数据集
+            for (const [modelName, modelData] of Object.entries(data)) {
+                if (modelData && Array.isArray(modelData)) {
+                    const color = colors[colorIndex % colors.length];
+                    colorIndex++;
+                    
+                    // 创建与时间标签对齐的收益率数据
+                    const profits = [];
+                    const timeMap = {};
+                    
+                    // 建立时间到收益率的映射
+                    modelData.forEach(point => {
+                        timeMap[point.time] = point.profit;
+                    });
+                    
+                    // 根据时间标签填充收益率数据
+                    allTimes.forEach(timeStr => {
+                        const profitValue = timeMap[timeStr];
+                        if (profitValue !== undefined) {
+                            const numValue = typeof profitValue === 'string' ? parseFloat(profitValue) : Number(profitValue);
+                            profits.push(isNaN(numValue) ? null : numValue);
+                        } else {
+                            profits.push(null);
+                        }
+                    });
+                    
+                    const dataset = {
+                        label: modelName,
+                        data: profits,
+                        borderColor: color,
+                        backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    };
+                    
+                    chart.data.datasets.push(dataset);
+                }
+            }
+            
+            // 强制更新图表
+            chart.update('active');
+        }
+        
+        // HTTP轮询获取数据（GitHub Pages 的主要数据获取方式）
+        function fetchPerformanceData() {
+            // 如果 Socket.IO 可用，跳过 HTTP 轮询（由 Socket.IO 推送）
+            if (useSocketIO && socket && socket.connected) {
+                return;
+            }
+            
+            const url = `${API_BASE}/api/performance`;
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                },
+                cache: 'no-store'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (chart) {
+                        updatePerformanceChart(chart, data);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ 获取性能数据失败:', error.message);
+                });
+        }
+        
+        // 启动初始化过程
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化图表
+            let chart = null;
+            const chartInitInterval = setInterval(() => {
+                const newChart = initChart();
+                if (newChart) {
+                    chart = newChart;
+                    clearInterval(chartInitInterval);
+                    console.log('图表初始化完成');
+                    // 初始化后立即获取一次数据
+                    fetchPerformanceData();
+                    // 开始定时轮询（每10秒）
+                    // 注意：如果 Socket.IO 连接成功，HTTP 轮询会被跳过
+                    setInterval(fetchPerformanceData, 10000);
+                }
+            }, 1000);
+            
+            // 添加切换显示数据的按钮事件监听器
+            let showFullData = false;
+            const toggleButton = document.getElementById('toggleDataButton');
+            if (toggleButton) {
+                toggleButton.addEventListener('click', function() {
+                    showFullData = !showFullData;
+                    toggleButton.textContent = showFullData ? '显示最近数据' : '显示全部数据';
+                    
+                    const url = showFullData ? `${API_BASE}/api/performance_full` : `${API_BASE}/api/performance`;
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (chart) {
+                                updatePerformanceChart(chart, data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Failed to load performance data:', error);
+                        });
+                });
+            }
+            
+            // 初始化日志容器
+            const logContainer = initLogContainer();
+            
+            // Socket.IO 事件监听已在上面初始化时设置，这里不需要重复设置
+            // 但我们可以添加一些额外的监听器用于调试
+            if (socket) {
+                // 如果连接成功，等待图表初始化后获取一次初始数据
+                socket.on('connect', function() {
+                    const waitForChart = setInterval(() => {
+                        if (chart) {
+                            clearInterval(waitForChart);
+                            // Socket.IO 连接成功时，初始数据会通过 performance_update 事件推送
+                            // 但为了确保，我们也主动获取一次
+                            if (!useSocketIO) {
+                                fetchPerformanceData();
+                            }
+                        }
+                    }, 100);
+                    setTimeout(() => clearInterval(waitForChart), 5000);
+                });
+            }
+            
+            // 页面加载时获取初始日志
+            window.onload = function() {
+                fetch(`${API_BASE}/api/logs`)
+                    .then(response => response.json())
+                    .then(logs => {
+                        if (Array.isArray(logs)) {
+                            logs.forEach(log => addLogEntry(logContainer, log));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to load logs:', error);
+                    });
+            };
+        });
+    </script>
+</body>
+</html>
