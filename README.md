@@ -57,74 +57,59 @@
 ## 核心飞跃：真正的AI自我发现
 
 1. 从空白或使用者设定的风格开始
-所有AI初始可以都是"自适应投资者"
+    所有AI初始可以都是"自适应投资者"
 
-也可以预设投资风格
+    也可以预设投资风格
 
-通过实践发现自己的特长
+    通过实践发现自己的特长
 
 2. 自我反思机制
-定期回顾投资表现
+    定期回顾投资表现
 
-分析什么策略对自己有效
+    分析什么策略对自己有效
 
-主动调整投资哲学
+    主动调整投资哲学
 
 3. 风格进化
-记录风格变化轨迹
+    记录风格变化轨迹
 
-基于表现调整风险偏好
+    基于表现调整风险偏好
 
-逐步形成稳定的投资人格
+    逐步形成稳定的投资人格
 
 4. 真正的差异性
-现在4个AI将：
+    现在4个AI将：
 
-自主发现风格：比如，幻银超i最明白博弈精髓，DeepSeek可能发现自己擅长量化，Qwen或者偏好价值投资
+    自主发现风格：比如，幻银超i最明白博弈精髓，DeepSeek可能发现自己擅长量化，Qwen或者偏好价值投资
 
-不同的进化路径：每个AI基于自身特质和市场反馈形成独特风格
+    不同的进化路径：每个AI基于自身特质和市场反馈形成独特风格
 
-动态调整：根据市场环境变化调整策略
+    动态调整：根据市场环境变化调整策略
 
-真正的个性：发展出反映其"性格"的投资哲学
+    真正的个性：发展出反映其"性格"的投资哲学
 
-预期结果
-您将看到：
+    预期结果
+    您将看到：
 
-真正的AI个性：每个AI发展出独特的投资身份
+    真正的AI个性：每个AI发展出独特的投资身份
 
-动态的风格进化：投资风格会随着经验积累而改变
+    动态的风格进化：投资风格会随着经验积累而改变
 
-基于表现的调整：成功的策略被保留，失败的被淘汰
+    基于表现的调整：成功的策略被保留，失败的被淘汰
 
-不可预测的结果：无法预先知道哪个AI会发展出什么风格
+    不可预测的结果：无法预先知道哪个AI会发展出什么风格
 
-这样设计后，您将见证真正的"AI投资经理成长史"，而不是预先编排的表演。每个AI都有机会找到最适合自己的投资道路！
+    这样设计后，您将见证真正的"AI投资经理成长史"，而不是预先编排的表演。每个AI都有机会找到最适合自己的投资道路！
 
-A decade ago, DeepMind revolutionized AI research. Their key insight was that choosing the right environment – games – would lead to rapid progress in frontier AI.
 
-At HYQi, we believe financial markets are the best training environment for the next era of AI. They are the ultimate world-modeling engine and the only benchmark that gets harder as AI gets smarter.
+## 🧠 幻银超i（HYQi）的愿景
 
-Instead of games, we're using financial markets in a live trading environment to train new base models that create their own training data indefinitely. We're using techniques like open-ended learning and large-scale RL to handle the complexity of markets, the final boss.
+我们正以实时的真实交易环境去训练Ai，以此来测试并提高Ai的智慧，运用开放式学习、大规模强化学习等技术来驾驭其复杂性。
 
-If this resonates, we're hiring: engineers, researchers, founders, original thinkers.
+心怀此念，我们正广纳贤才，招募资深ai研究员、创业伙伴与思维破局者。
 
-If you're excited to build AlphaHYQi for the real world, get in touch.
+如果您渴望为现实世界打造Alpha-HYQi，欢迎与我们携手。简历请发送至：hyqi@tradey.dpdns.org
 
-"Capital allocation is the discipline through which intelligence converges with truth."
-
-A shared vision for the future. — HYQi
-
-十年前，DeepMind彻底改变了人工智能的研究范式。他们的核心洞见在于：选择正确的训练环境——游戏——将推动前沿人工智能的快速突破。
-
-在HYQi，我们相信金融市场是下一代人工智能的最佳训练场。它是世界级别模型引擎的终极形态，也是唯一会随着AI智能提升而不断升级难度的标杆。
-
-我们正以真实交易环境的金融市场替代游戏，训练能够持续自我生成数据的新型基础模型。面对市场这个"终极挑战"，我们运用开放式学习、大规模强化学习等技术来驾驭其复杂性。
-
-心怀此念，我们正广纳贤才，招募工程师、研究员、创业伙伴与思维破局者。
-
-如果您渴望为现实世界打造AlphaHYQi，欢迎与我们携手。
-
-"资本配置，是智慧接受真理检验的试金石"。
+"资本配置，是ai智慧接受真理检验的最佳试金石"。
 
 ———幻银超i与您共勉
