@@ -25,13 +25,24 @@
 🎯 新增了异步执行功能，提高系统运行速度
 
 🤖 **4大模型并行**：幻银超i、DeepSeek、Qwen通义千问、豆包同时运行，比较收益
-📈 **全市场选股**：AI自主从全市场选择有潜力的股票
+📈 **全市场选股**：AI自主从全市场选择有潜力的股票，自定义股票池（可选）
 💹 **实时行情**：集成实时A股数据，供ai使用并用于实际交易
 💹 **历史行情+财务数据**：集成A股历史行情和财务数据，供ai分析和训练
 🎯 **智能交易**：基于AI分析生成买卖信号并全自动执行交易
 🌈 **多种策略**：包括趋势跟踪、均线策略、技术指标策略、量化套利策略等，完全由ai自动选择并不断进化
 📊 **实时监控**：UI界面实时显示收益曲线和交易日志
 🔒 **风险控制**：内置仓位控制和止损机制
+
+## 📊 Ai炒股大赛排行榜、实时收益及决策日志、实时投资组合
+
+[![Ai炒股大赛历史排行榜(自定义票池)](https://img.shields.io/badge/📈_查看完整报告-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reports/)
+
+[![Ai炒股大赛历史排行榜(全市场)](https://img.shields.io/badge/📈_查看完整报告-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reportsall/)
+
+[![实时收益及决策日志](https://img.shields.io/badge/🎯_系统概览-Dashboard-green?style=for-the-badge&logo=chart-line)](https://hyqibot.github.io/A-share-Ai/)
+
+[![实时投资组合](https://img.shields.io/badge/📊_投资组合-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
+
 
 ## 安装使用
 
