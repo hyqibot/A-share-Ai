@@ -35,9 +35,9 @@
 
 ## 📊 Ai炒股大赛排行榜、实时收益及决策日志、实时投资组合
 
-[![Ai炒股大赛历史排行榜(自定义票池)](https://img.shields.io/badge/📈_Ai炒股大赛历史排行榜(自定义票池-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reports/)
+[![Ai炒股大赛历史排行榜(自定义)](https://img.shields.io/badge/📈_Ai炒股大赛历史排行榜(自定义)-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reports.html)
 
-[![Ai炒股大赛历史排行榜(全市场)](https://img.shields.io/badge/📈_Ai炒股大赛历史排行榜(全市场)-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reportsall/)
+[![Ai炒股大赛历史排行榜(全市场)](https://img.shields.io/badge/📈_Ai炒股大赛历史排行榜(全市场)-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reportsall.html)
 
 [![实时收益及决策日志](https://img.shields.io/badge/🎯_实时收益及决策日志-Dashboard-green?style=for-the-badge&logo=chart-line)](https://hyqibot.github.io/A-share-Ai/)
 
