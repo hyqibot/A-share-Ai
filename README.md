@@ -35,13 +35,13 @@
 
 ## 📊 Ai炒股大赛排行榜、实时收益及决策日志、实时投资组合
 
-[![Ai炒股大赛历史排行榜(自定义票池)](https://img.shields.io/badge/📈_查看完整报告-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reports/)
+[![Ai炒股大赛历史排行榜(自定义票池)](https://img.shields.io/badge/📈_Ai炒股大赛历史排行榜(自定义票池-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reports/)
 
-[![Ai炒股大赛历史排行榜(全市场)](https://img.shields.io/badge/📈_查看完整报告-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reportsall/)
+[![Ai炒股大赛历史排行榜(全市场)](https://img.shields.io/badge/📈_Ai炒股大赛历史排行榜(全市场)-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reportsall/)
 
-[![实时收益及决策日志](https://img.shields.io/badge/🎯_系统概览-Dashboard-green?style=for-the-badge&logo=chart-line)](https://hyqibot.github.io/A-share-Ai/)
+[![实时收益及决策日志](https://img.shields.io/badge/🎯_实时收益及决策日志-Dashboard-green?style=for-the-badge&logo=chart-line)](https://hyqibot.github.io/A-share-Ai/)
 
-[![实时投资组合](https://img.shields.io/badge/📊_投资组合-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
+[![实时投资组合](https://img.shields.io/badge/📊_实时投资组合-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
 
 
 ## 安装使用
