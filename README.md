@@ -51,7 +51,7 @@
 
    启动方法很简单：傻瓜式，无需python基础
    下载Releases安装包，解压，将user_config.json.example重命名为user_config.json，填写参数
-   需要用到的参数有几类：1）真实交易账户的安装路径、账号，兼容各大券商的QMT和同花顺交易；2）自选股票池通达信本地路径；3）deepseek等大模型api-key；4）licence：hyqibot
+   需要用到的参数有几类：1）真实交易账户的安装路径、账号，可接入专业交易api（另询官邮），兼容各大券商的QMT和同花顺交易；2）自选股票池通达信本地路径；3）deepseek等大模型api-key；4）licence：hyqibot
    填好参数保存，右键以管理员身份运行解压好的exe文件，图形界面上点击启动交易即可。
 
 ## 核心飞跃：真正的AI自我发现
