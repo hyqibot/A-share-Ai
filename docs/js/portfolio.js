@@ -1,4 +1,67 @@
-const API_BASE = window.API_CONFIG.baseUrl;
+const API_BASE = window.API_CONFIG ? window.API_CONFIG.baseUrl : 'http://localhost:4000';
+
+// SocketIO连接相关变量
+let socket = null;
+let useSocketIO = false;
+let refreshInterval = null;
+
+// 初始化SocketIO连接
+function initSocketIO() {
+    try {
+        if (typeof io !== 'undefined') {
+            const SOCKET_URL = API_BASE;
+            socket = io(SOCKET_URL, {
+                reconnection: true,
+                transports: ['websocket', 'polling']
+            });
+            
+            socket.on('connect', function() {
+                useSocketIO = true;
+                console.log('✅ SocketIO连接成功，portfolio数据将实时推送');
+                // SocketIO连接成功后，清除定时刷新
+                if (refreshInterval) {
+                    clearInterval(refreshInterval);
+                    refreshInterval = null;
+                }
+            });
+            
+            socket.on('disconnect', function() {
+                useSocketIO = false;
+                console.log('⚠️ SocketIO连接断开，将使用定时刷新');
+                // SocketIO断开后，启用定时刷新
+                if (!refreshInterval) {
+                    refreshInterval = setInterval(function() {
+                        loadData();
+                    }, 3600000); // 3600秒 = 1小时
+                    console.log('📊 启用定时刷新：每3600秒（1小时）刷新一次');
+                }
+            });
+            
+            socket.on('connect_error', function(error) {
+                useSocketIO = false;
+                console.warn('⚠️ SocketIO连接失败，将使用定时刷新:', error);
+                // 连接失败后，启用定时刷新
+                if (!refreshInterval) {
+                    refreshInterval = setInterval(function() {
+                        loadData();
+                    }, 3600000); // 3600秒 = 1小时
+                    console.log('📊 启用定时刷新：每3600秒（1小时）刷新一次');
+                }
+            });
+            
+            // 监听portfolio更新事件
+            socket.on('portfolio_update', function(data) {
+                console.log('📊 收到portfolio更新推送:', data);
+                // 自动刷新数据
+                loadData();
+            });
+        } else {
+            console.warn('⚠️ SocketIO库未加载，将使用定时刷新');
+        }
+    } catch (e) {
+        console.warn('⚠️ SocketIO初始化失败，将使用定时刷新:', e);
+    }
+}
 
 // 加载模型列表（带缓存）
 async function loadModels() {
@@ -24,20 +87,28 @@ async function loadModels() {
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
-        const models = await response.json();
+        const result = await response.json();
+        
+        // 处理返回的数据格式：{status: 'success', data: [{name: '...'}, ...]} 或直接是数组
+        let modelList = [];
+        if (result && result.status === 'success' && result.data) {
+            modelList = result.data.map(m => typeof m === 'string' ? m : m.name);
+        } else if (Array.isArray(result)) {
+            modelList = result.map(m => typeof m === 'string' ? m : m.name);
+        }
         
         // 保存到缓存
-        if (window.CacheHelper) {
-            window.CacheHelper.set('models', models, window.CacheHelper.CACHE_EXPIRY.models);
+        if (window.CacheHelper && modelList.length > 0) {
+            window.CacheHelper.set('models', modelList, window.CacheHelper.CACHE_EXPIRY.models);
         }
         
         const select = document.getElementById('modelFilter');
         select.innerHTML = '<option value="">所有模型</option>';
         
-        models.forEach(model => {
+        modelList.forEach(modelName => {
             const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
+            option.value = modelName;
+            option.textContent = modelName;
             select.appendChild(option);
         });
     } catch (error) {
@@ -56,9 +127,10 @@ async function loadData() {
 
     try {
         const params = new URLSearchParams();
-        if (model) params.append('model', model);
+        if (model) params.append('model_name', model);  // 修正参数名：应该是 model_name
         if (startDate) params.append('start_date', startDate);
         if (endDate) params.append('end_date', endDate);
+        params.append('limit', '1000');  // 添加limit参数
 
         const response = await fetch(`${API_BASE}/api/trade_history?${params}`, {
             mode: 'cors'
@@ -66,7 +138,17 @@ async function loadData() {
         
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
-        const data = await response.json();
+        const result = await response.json();
+
+        // 处理返回的数据格式：{status: 'success', data: [...]} 或直接是数组
+        let data = [];
+        if (result && result.status === 'success' && result.data) {
+            data = result.data;
+        } else if (Array.isArray(result)) {
+            data = result;
+        } else if (result && result.data && Array.isArray(result.data)) {
+            data = result.data;
+        }
 
         if (data && data.length > 0) {
             renderTradeHistory(data);
@@ -133,6 +215,9 @@ function formatNumber(num) {
 
 // 页面加载时初始化
 window.addEventListener('DOMContentLoaded', () => {
+    // 初始化SocketIO连接
+    initSocketIO();
+    
     loadModels();
     loadData();
     
@@ -143,5 +228,13 @@ window.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
     document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+    
+    // 如果SocketIO不可用，启用定时刷新（每3600秒）
+    if (!useSocketIO && !refreshInterval) {
+        refreshInterval = setInterval(function() {
+            loadData();
+        }, 3600000); // 3600秒 = 1小时
+        console.log('📊 启用定时刷新：每3600秒（1小时）刷新一次');
+    }
 });
 
