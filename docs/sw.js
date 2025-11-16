@@ -1,18 +1,17 @@
 // Service Worker 版本号（更新时修改此版本号以强制更新）
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v2.0.0';
 const CACHE_NAME = `ai-trader-${CACHE_VERSION}`;
 
-// 需要缓存的静态资源
+// 需要缓存的静态资源（使用相对路径，适配 GitHub Pages）
 const STATIC_ASSETS = [
-    '/web/',
-    '/web/dashboard.html',
-    '/web/portfolio.html',
-    '/web/config.js',
-    '/web/js/dashboard.js',
-    '/web/js/portfolio.js',
-    '/web/js/cache-helper.js',
-    '/web/manifest.json',
-    // Chart.js 通过 CDN 加载，不需要缓存
+    './',
+    './index.html',
+    './portfolio.html',
+    './config.js',
+    './manifest.json',
+    './js/sw-helper.js',
+    './js/cache-helper.js',
+    // Chart.js 和 Socket.IO 通过 CDN 加载，不需要缓存
 ];
 
 // 不需要缓存的路径（API 调用，确保实时性）
@@ -117,7 +116,7 @@ self.addEventListener('fetch', (event) => {
                     .catch(() => {
                         // 网络失败且无缓存时，返回离线页面
                         if (event.request.mode === 'navigate') {
-                            return caches.match('/web/dashboard.html');
+                            return caches.match('./index.html') || caches.match('./');
                         }
                     });
             })

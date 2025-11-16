@@ -1,72 +1,98 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>交易历史与持仓分析</title>
+    <title>Ai投资组合</title>
     <script src="config.js"></script>
-    <script src="js/cache-helper.js"></script>
     <script src="js/sw-helper.js"></script>
+    <script src="js/cache-helper.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: #0d1117;
             color: #c9d1d9;
-            padding: 20px;
+            line-height: 1.6;
         }
         .header {
+            background: #161b22;
+            color: #c9d1d9;
+            padding: 20px 40px;
+            border-bottom: 1px solid #21262d;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #21262d;
         }
         .header h1 {
+            font-size: 26px;
+            font-weight: 600;
             color: #f0f6fc;
-            font-size: 28px;
+            margin: 0;
+            text-align: left;
         }
         .header-nav {
             display: flex;
-            gap: 24px;
+            gap: 30px;
+            justify-content: center;
+            flex: 1;
         }
         .header-nav a {
             color: #8b949e;
             text-decoration: none;
             font-weight: 500;
             font-size: 20px;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
         }
         .header-nav a:hover, .header-nav a.active {
+            border-bottom-color: #f0883e;
             color: #f0883e;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 40px;
         }
         .filters {
             background: #161b22;
             padding: 20px;
             border-radius: 8px;
             border: 1px solid #21262d;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             display: flex;
-            gap: 15px;
+            gap: 20px;
             flex-wrap: wrap;
             align-items: center;
         }
         .filter-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .filter-group label {
+            font-weight: 500;
             color: #c9d1d9;
-            font-size: 14px;
+            min-width: 80px;
         }
         .filter-group select, .filter-group input {
             padding: 8px 12px;
             background: #0d1117;
             border: 1px solid #30363d;
             border-radius: 4px;
-            color: #c9d1d9;
             font-size: 14px;
+            color: #c9d1d9;
+            min-width: 150px;
+        }
+        .filter-group select option {
+            background: #0d1117;
+            color: #c9d1d9;
         }
         .filter-group button {
             padding: 8px 20px;
@@ -76,44 +102,90 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: 500;
+            transition: background 0.3s;
         }
         .filter-group button:hover {
             background: #2ea043;
         }
+        .section {
+            background: #161b22;
+            border-radius: 8px;
+            border: 1px solid #21262d;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 20px;
+            background: #161b22;
+            border-bottom: 1px solid #21262d;
+        }
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #161b22;
-            border: 1px solid #21262d;
-            border-radius: 8px;
-            overflow: hidden;
+            font-size: 14px;
         }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #21262d;
+        thead {
+            background: #161b22;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         th {
-            background: #0d1117;
-            color: #58a6ff;
+            padding: 12px 15px;
+            text-align: left;
             font-weight: 600;
+            color: #f0f6fc;
+            border-bottom: 2px solid #21262d;
         }
-        tr:hover {
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #21262d;
+            color: #c9d1d9;
+        }
+        tbody tr:hover {
             background: #1c2128;
         }
         .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
+        }
+        .text-right .badge {
+            float: right;
         }
         .badge.buy {
-            background: #238636;
-            color: #fff;
+            background: #1f6f3a;
+            color: #7ee787;
         }
         .badge.sell {
-            background: #da3633;
-            color: #fff;
+            background: #801f2f;
+            color: #ff7b72;
+        }
+        .badge.profit {
+            background: #1f6f3a;
+            color: #7ee787;
+        }
+        .badge.loss {
+            background: #801f2f;
+            color: #ff7b72;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
         }
         .loading {
             text-align: center;
@@ -121,42 +193,505 @@
             color: #8b949e;
         }
         .error {
-            color: #da3633;
+            background: #801f2f;
+            color: #ff7b72;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px;
+        }
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #8b949e;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #21262d;
+        }
+        .stat-card .label {
+            font-size: 12px;
+            color: #8b949e;
+            margin-bottom: 8px;
+        }
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #f0f6fc;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>交易历史与持仓分析</h1>
+        <h1>Ai投资组合</h1>
         <div class="header-nav">
-            <a href="index.html">实时收益及决策日志</a>
-            <a href="portfolio.html" class="active">AI投资组合</a>
+            <a href="index.html">实时收益及Ai决策日志</a>
+            <a href="portfolio.html" class="active">Ai投资组合</a>
         </div>
     </div>
 
+    <div class="container">
     <div class="filters">
         <div class="filter-group">
-            <label>模型:</label>
+                <label>模型：</label>
             <select id="modelFilter">
-                <option value="">所有模型</option>
+                    <option value="">全部模型</option>
             </select>
         </div>
         <div class="filter-group">
-            <label>开始日期:</label>
+                <label>股票代码：</label>
+                <input type="text" id="symbolFilter" placeholder="如：000001">
+            </div>
+            <div class="filter-group">
+                <label>开始日期：</label>
             <input type="date" id="startDate">
         </div>
         <div class="filter-group">
-            <label>结束日期:</label>
+                <label>结束日期：</label>
             <input type="date" id="endDate">
         </div>
         <div class="filter-group">
-            <button onclick="loadData()">刷新数据</button>
+                <button onclick="loadData()">查询</button>
+                <button onclick="resetFilters()">重置</button>
+            </div>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid"></div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>持仓历史</h2>
+            </div>
+            <div class="table-container">
+                <table id="positionsTable">
+                    <thead>
+                        <tr>
+                            <th>模型</th>
+                            <th>股票代码</th>
+                            <th>持仓数量</th>
+                            <th>平均成本</th>
+                            <th>当前价格</th>
+                            <th class="text-right">持仓市值</th>
+                            <th class="text-right">盈亏金额</th>
+                            <th class="text-right">盈亏比例</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positionsBody">
+                        <tr>
+                            <td colspan="8" class="loading">正在加载数据...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>交易历史</h2>
+            </div>
+            <div class="table-container">
+                <table id="tradesTable">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>模型</th>
+                            <th>股票代码</th>
+                            <th>操作</th>
+                            <th class="text-right">数量</th>
+                            <th class="text-right">价格</th>
+                            <th class="text-right">成交金额</th>
+                            <th class="text-right">手续费</th>
+                            <th>置信度</th>
+                            <th>投资风格</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradesBody">
+                        <tr>
+                            <td colspan="10" class="loading">正在加载数据...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <div id="content" class="loading">加载中...</div>
-
-    <script src="js/portfolio.js"></script>
+    <script>
+        // 从配置获取 API 地址
+        const API_BASE = window.API_CONFIG ? window.API_CONFIG.baseUrl : 'http://localhost:4000';
+        
+        // Socket.IO 服务器地址
+        let SOCKET_URL = API_BASE;
+        if (!SOCKET_URL.startsWith('http')) {
+            SOCKET_URL = `http://${SOCKET_URL}`;
+        }
+        
+        let models = [];
+        let socket = null;
+        let useSocketIO = false;
+        let refreshInterval = null;
+        
+        // 初始化SocketIO连接
+        function initSocketIO() {
+            try {
+                if (typeof io !== 'undefined') {
+                    socket = io(SOCKET_URL, {
+                        reconnection: true,
+                        transports: ['websocket', 'polling']
+                    });
+                    
+                    socket.on('connect', function() {
+                        useSocketIO = true;
+                        console.log('✅ SocketIO连接成功，portfolio数据将实时推送');
+                        // SocketIO连接成功后，清除定时刷新
+                        if (refreshInterval) {
+                            clearInterval(refreshInterval);
+                            refreshInterval = null;
+                        }
+                    });
+                    
+                    socket.on('disconnect', function() {
+                        useSocketIO = false;
+                        console.log('⚠️ SocketIO连接断开，将使用定时刷新');
+                        // SocketIO断开后，启用定时刷新
+                        if (!refreshInterval) {
+                            refreshInterval = setInterval(function() {
+                                loadData();
+                            }, 3600000); // 3600秒 = 1小时
+                            console.log('📊 启用定时刷新：每3600秒（1小时）刷新一次');
+                        }
+                    });
+                    
+                    socket.on('connect_error', function(error) {
+                        useSocketIO = false;
+                        console.warn('⚠️ SocketIO连接失败，将使用定时刷新:', error);
+                        // 连接失败后，启用定时刷新
+                        if (!refreshInterval) {
+                            refreshInterval = setInterval(function() {
+                                loadData();
+                            }, 3600000); // 3600秒 = 1小时
+                            console.log('📊 启用定时刷新：每3600秒（1小时）刷新一次');
+                        }
+                    });
+                    
+                    // 监听portfolio更新事件
+                    socket.on('portfolio_update', function(data) {
+                        console.log('📊 收到portfolio更新推送:', data);
+                        // 自动刷新数据
+                        loadData();
+                    });
+                } else {
+                    console.warn('⚠️ SocketIO库未加载，将使用定时刷新');
+                }
+            } catch (e) {
+                console.warn('⚠️ SocketIO初始化失败，将使用定时刷新:', e);
+            }
+        }
+        
+        // 初始化：加载模型列表
+        async function init() {
+            // 初始化SocketIO连接
+            initSocketIO();
+            
+            await loadModels();
+            await loadData();
+            
+            // 如果SocketIO不可用，启用定时刷新（每3600秒）
+            if (!useSocketIO && !refreshInterval) {
+                refreshInterval = setInterval(function() {
+                    loadData();
+                }, 3600000); // 3600秒 = 1小时
+                console.log('📊 启用定时刷新：每3600秒（1小时）刷新一次');
+            }
+        }
+        
+        async function loadModels() {
+            try {
+                // 先尝试从缓存获取模型列表
+                if (window.CacheHelper) {
+                    const cachedModels = window.CacheHelper.get('models');
+                    if (cachedModels && Array.isArray(cachedModels) && cachedModels.length > 0) {
+                        models = cachedModels;
+                        const select = document.getElementById('modelFilter');
+                        select.innerHTML = '<option value="">全部模型</option>';
+                        models.forEach(modelName => {
+                            const option = document.createElement('option');
+                            option.value = modelName;
+                            option.textContent = modelName;
+                            select.appendChild(option);
+                        });
+                        // 使用缓存的数据，仍然在后台更新
+                    }
+                }
+                
+                const response = await fetch(`${API_BASE}/api/models`, { mode: 'cors' });
+                const result = await response.json();
+                if (result.status === 'success' && result.data.length > 0) {
+                    models = result.data.map(m => m.name);
+                    
+                    // 缓存模型列表（1小时）
+                    if (window.CacheHelper) {
+                        window.CacheHelper.set('models', models, window.CacheHelper.CACHE_EXPIRY.models);
+                    }
+                    
+                    const select = document.getElementById('modelFilter');
+                    select.innerHTML = '<option value="">全部模型</option>';
+                    models.forEach(modelName => {
+                        const option = document.createElement('option');
+                        option.value = modelName;
+                        option.textContent = modelName;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('加载模型列表失败:', error);
+            }
+        }
+        
+        async function loadData() {
+            const model = document.getElementById('modelFilter').value;
+            const symbol = document.getElementById('symbolFilter').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            // 加载统计数据
+            await loadStatistics(model);
+            
+            // 加载持仓
+            await loadPositions(model);
+            
+            // 加载交易历史
+            await loadTrades(model, symbol, startDate, endDate);
+        }
+        
+        async function loadStatistics(model) {
+            try {
+                const cacheKey = `statistics_${model || 'all'}`;
+                
+                // 先尝试从缓存获取统计数据
+                if (window.CacheHelper) {
+                    const cachedStats = window.CacheHelper.get(cacheKey);
+                    if (cachedStats) {
+                        const stats = cachedStats;
+                        const statsGrid = document.getElementById('statsGrid');
+                        statsGrid.innerHTML = `
+                            <div class="stat-card">
+                                <div class="label">总交易次数</div>
+                                <div class="value">${stats.total_trades || 0}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">买入次数</div>
+                                <div class="value">${stats.buy_trades || 0}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">卖出次数</div>
+                                <div class="value">${stats.sell_trades || 0}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">总成交量</div>
+                                <div class="value">${formatNumber(stats.total_volume || 0)}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">总成交额</div>
+                                <div class="value">${formatCurrency(stats.total_value || 0)}</div>
+                            </div>
+                        `;
+                        // 使用缓存数据，仍然在后台更新
+                    }
+                }
+                
+                const url = `${API_BASE}/api/trade_statistics${model ? '?model_name=' + encodeURIComponent(model) : ''}`;
+                const response = await fetch(url, { mode: 'cors' });
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data) {
+                    const stats = result.data;
+                    
+                    // 缓存统计数据（5分钟）
+                    if (window.CacheHelper) {
+                        window.CacheHelper.set(cacheKey, stats, 5 * 60 * 1000);
+                    }
+                    
+                    const statsGrid = document.getElementById('statsGrid');
+                    statsGrid.innerHTML = `
+                        <div class="stat-card">
+                            <div class="label">总交易次数</div>
+                            <div class="value">${stats.total_trades || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">买入次数</div>
+                            <div class="value">${stats.buy_trades || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">卖出次数</div>
+                            <div class="value">${stats.sell_trades || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">总成交量</div>
+                            <div class="value">${formatNumber(stats.total_volume || 0)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">总成交额</div>
+                            <div class="value">${formatCurrency(stats.total_value || 0)}</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+        
+        async function loadPositions(model) {
+            const body = document.getElementById('positionsBody');
+            body.innerHTML = '<tr><td colspan="8" class="loading">正在加载...</td></tr>';
+            
+            try {
+                const url = `${API_BASE}/api/current_positions${model ? '?model_name=' + encodeURIComponent(model) : ''}`;
+                const response = await fetch(url, { mode: 'cors' });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    if (result.data.length === 0) {
+                        body.innerHTML = '<tr><td colspan="8" class="empty">暂无持仓数据</td></tr>';
+                        return;
+                    }
+                    
+                    body.innerHTML = result.data.map(pos => `
+                        <tr>
+                            <td>${pos.model_name}</td>
+                            <td>${pos.symbol}</td>
+                            <td>${formatNumber(pos.quantity)}</td>
+                            <td>${formatCurrency(pos.avg_price)}</td>
+                            <td>${formatCurrency(pos.current_price)}</td>
+                            <td class="text-right">${formatCurrency(pos.market_value)}</td>
+                            <td class="text-right">
+                                <span class="${pos.profit_loss >= 0 ? 'badge profit' : 'badge loss'}">
+                                    ${formatCurrency(pos.profit_loss)}
+                                </span>
+                            </td>
+                            <td class="text-right">
+                                <span class="${pos.profit_loss_pct >= 0 ? 'badge profit' : 'badge loss'}">
+                                    ${pos.profit_loss_pct.toFixed(2)}%
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    body.innerHTML = `<tr><td colspan="8" class="error">${result.message}</td></tr>`;
+                }
+            } catch (error) {
+                body.innerHTML = `<tr><td colspan="8" class="error">加载失败: ${error.message}</td></tr>`;
+            }
+        }
+        
+        async function loadTrades(model, symbol, startDate, endDate) {
+            const body = document.getElementById('tradesBody');
+            body.innerHTML = '<tr><td colspan="10" class="loading">正在加载...</td></tr>';
+            
+            try {
+                const params = new URLSearchParams();
+                if (model) params.append('model_name', model);
+                if (symbol) params.append('symbol', symbol);
+                if (startDate) params.append('start_date', startDate);
+                if (endDate) params.append('end_date', endDate);
+                params.append('limit', '1000');
+                
+                const response = await fetch(`${API_BASE}/api/trade_history?${params}`, { mode: 'cors' });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    if (result.data.length === 0) {
+                        body.innerHTML = '<tr><td colspan="10" class="empty">暂无交易记录</td></tr>';
+                        return;
+                    }
+                    
+                    body.innerHTML = result.data.map(trade => {
+                        const timestamp = new Date(trade.timestamp);
+                        return `
+                            <tr>
+                                <td>${timestamp.toLocaleString('zh-CN')}</td>
+                                <td>${trade.model_name}</td>
+                                <td>${trade.symbol}</td>
+                                <td><span class="badge ${trade.action === 'BUY' ? 'buy' : 'sell'}">${trade.action === 'BUY' ? '买入' : '卖出'}</span></td>
+                                <td class="text-right">${formatNumber(trade.amount)}</td>
+                                <td class="text-right">${formatCurrency(trade.price)}</td>
+                                <td class="text-right">${formatCurrency(trade.total_value || trade.price * trade.amount)}</td>
+                                <td class="text-right">${formatCurrency(trade.commission || 0)}</td>
+                                <td>${trade.confidence ? (trade.confidence * 100).toFixed(2) + '%' : '-'}</td>
+                                <td>${trade.investment_style || '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    body.innerHTML = `<tr><td colspan="10" class="error">${result.message}</td></tr>`;
+                }
+            } catch (error) {
+                body.innerHTML = `<tr><td colspan="10" class="error">加载失败: ${error.message}</td></tr>`;
+            }
+        }
+        
+        function resetFilters() {
+            document.getElementById('modelFilter').value = '';
+            document.getElementById('symbolFilter').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            loadData();
+        }
+        
+        function formatCurrency(value) {
+            if (value === null || value === undefined) return '¥0.00';
+            return '¥' + parseFloat(value).toLocaleString('zh-CN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+        
+        function formatNumber(value) {
+            if (value === null || value === undefined) return '0';
+            return parseFloat(value).toLocaleString('zh-CN');
+        }
+        
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker 注册成功:', registration.scope);
+                        // 检查是否有更新
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('🔄 发现 Service Worker 更新，将在刷新后生效');
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn('⚠️ Service Worker 注册失败:', error);
+                    });
+                
+                // 监听 Service Worker 控制权变更
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        console.log('🔄 Service Worker 已更新，刷新页面...');
+                        // 可选：自动刷新页面以使用新的 Service Worker
+                        // window.location.reload();
+                    }
+                });
+            });
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
-

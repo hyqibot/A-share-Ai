@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ai-A股交易机器 A-share AI</title>
     <script src="config.js"></script>
+    <script src="js/sw-helper.js"></script>
+    <script src="js/cache-helper.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
@@ -257,71 +259,93 @@
                 </div>
                 
                 <div class="readme-container">
-                    <h1>幻银量化Ai-A股交易机器 A-share AI</h1>
+                    <h1>幻银量化A股AI交易系统A-share-Ai</h1>
 
                     <p>基于四大国内大模型（幻银超i、DeepSeek、通义千问、豆包）的A股自动交易系统，支持全市场选股和实盘交易。</p>
 
                     <h2>功能特性</h2>
 
+                    <p>🎯 让AI在A股市场中一展身手，让多个大语言模型在A股全市场股票中完全自主决策、同台竞技！</p>
+
+                    <p>🎯 接入A股真实交易账户，实时展示ai真实交易过程，实时+真实交易让系统有更广阔的应用空间</p>
+
+                    <p>🎯 多模型集成：支持幻银超i、DeepSeek、通义千问、豆包等多种大语言模型</p>
+
+                    <p>🎯 策略进化：基于交易表现，AI模型能够不断优化自己的投资策略</p>
+
+                    <p>⏰ 秒级别实盘交易支持 - 接入实盘秒级精度交易</p>
+
+                    <p>🚀 服务部署与并行执行 - 部署生产服务 + 并行模型执行</p>
+
+                    <p>🎨 ai交易逻辑展示 - 详细的交易日志可视化（完整交易过程展示）</p>
+
+                    <p>🎯 核心特色: 100% AI自主决策，零人工干预，ai策略自我发现、自我训练、自我进化</p>
+
+                    <p>🎯 特别功能：在交易过程中可添加实时人工干预和Ai进行互动（可选），适应大规模投资的真实场景</p>
+
+                    <p>🎯 新增了异步执行功能，提高系统运行速度</p>
+
                     <ul>
-                        <li><strong>真实交易账户</strong>：接入A股真实交易账户，实时展示ai真实交易过程，实时+真实交易让系统有更广阔的应用空间</li>
-                        <li><strong>秒级实盘交易</strong>：接入实盘秒级精度交易，实时展示ai真实交易过程</li>
-                        <li><strong>AI自主决策</strong>：100% AI自主决策，零人工干预，ai策略自我发现、自我训练、自我进化</li>
-                        <li><strong>可选实时干预</strong>：在交易过程中可添加实时人工干预和Ai进行互动（可选），适应大规模投资的真实场景</li>
-                        <li><strong>4大模型并行</strong>：幻银超i、DeepSeek、Qwen通义千问、豆包同时运行，比较收益</li>
-                        <li><strong>全市场选股</strong>：AI自主从全市场选择有潜力的股票</li>
-                        <li><strong>实时行情</strong>：集成实时A股数据，供ai使用并用于实际交易</li>
-                        <li><strong>历史行情+财务数据</strong>：集成A股历史行情和财务数据，供ai分析和训练</li>
-                        <li><strong>智能交易</strong>：基于AI分析生成买卖信号并全自动执行交易</li>
-                        <li><strong>多种策略</strong>：包括趋势跟踪、均线策略、技术指标策略、量化套利策略等，完全由ai自动选择并不断进化</li>
-                        <li><strong>实时监控</strong>：UI界面实时显示收益曲线和交易日志</li>
-                        <li><strong>风险控制</strong>：内置仓位控制和止损机制</li>
+                        <li>🤖 <strong>4大模型并行</strong>：幻银超i、DeepSeek、Qwen通义千问、豆包同时运行，比较收益</li>
+                        <li>📈 <strong>全市场选股</strong>：AI自主从全市场选择有潜力的股票，自定义股票池（可选）</li>
+                        <li>💹 <strong>实时行情</strong>：集成实时A股数据，供ai使用并用于实际交易</li>
+                        <li>💹 <strong>历史行情+财务数据</strong>：集成A股历史行情和财务数据，供ai分析和训练</li>
+                        <li>🎯 <strong>智能交易</strong>：基于AI分析生成买卖信号并全自动执行交易</li>
+                        <li>🌈 <strong>多种策略</strong>：包括趋势跟踪、均线策略、技术指标策略、量化套利策略等，完全由ai自动选择并不断进化</li>
+                        <li>📊 <strong>实时监控</strong>：UI界面实时显示收益曲线和交易日志</li>
+                        <li>🔒 <strong>风险控制</strong>：内置仓位控制和止损机制</li>
                     </ul>
+
+                    <h2>📊 Ai炒股大赛排行榜、实时收益及决策日志、实时投资组合</h2>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0;">
+                        <a href="https://hyqibot.github.io/A-share-Ai/reports/report.html" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #007acc; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            📈 Ai炒股大赛历史排行榜(基金运作)
+                        </a>
+                        <a href="https://hyqibot.github.io/A-share-Ai/reportsall/report.html" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #007acc; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            📈 Ai炒股大赛历史排行榜(全市场)
+                        </a>
+                        <a href="https://hyqibot.github.io/A-share-Ai/" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            🎯 实时收益及决策日志
+                        </a>
+                        <a href="https://hyqibot.github.io/A-share-Ai/portfolio.html" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #fd7e14; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                            📊 实时投资组合
+                        </a>
+                    </div>
 
                     <h2>安装使用</h2>
 
                     <ol>
-                        <li><strong>安装</strong>
-                        稍晚将打包成桌面exe软件，可直接下载运行，提供长达3个月的免费试用，使用者提供反馈被采纳，将可获取专业的技术支持和长期使用权。预约邮箱：<span class="email">hyqi@tradey.dpdns.org</span>，发送您的联系方式和简短介绍，我们将尽快安排试用。</li>
+                        <li><strong>安装及启动</strong><br>
+                        项目已打包成桌面exe软件，可直接下载运行，提供长达3个月的免费内测，使用者提供反馈被采纳，将可获取专业的技术支持和长期使用权。预约邮箱：<span class="email">hyqi@tradey.dpdns.org</span>，请Star项目（点右上五角星Star）后，发送您的联系方式、简短介绍并说明使用目的，我们将根据您的邮件内容决定是否安排内测试用，如您获得内测资格将在3-5个工作日左右邮件通知。</li>
+                        <li><strong>启动方法很简单：傻瓜式，无需python基础</strong><br>
+                        下载Releases安装包，解压，将user_config.json.example重命名为user_config.json，填写参数<br>
+                        需要用到的参数有几类：1）真实交易账户的安装路径、账号，可接入专业交易api（另询官邮），兼容各大券商的QMT和同花顺交易；2）自选股票池通达信本地路径；3）deepseek等大模型api-key；4）licence：hyqibot<br>
+                        填好参数保存，右键以管理员身份运行解压好的exe文件，图形界面上点击启动交易即可。</li>
                     </ol>
 
-                    <h2>核心改进</h2>
+                    <h2>核心飞跃：真正的AI自我发现</h2>
 
-                    <p>核心改进：真正的AI自我发现</p>
                     <ol>
-                        <li>从空白或使用者设定的风格开始</li>
+                        <li><strong>从空白或使用者设定的风格开始</strong><br>
+                        所有AI初始可以都是"自适应投资者"<br>
+                        也可以预设投资风格<br>
+                        通过实践发现自己的特长</li>
+                        <li><strong>自我反思机制</strong><br>
+                        定期回顾投资表现<br>
+                        分析什么策略对自己有效<br>
+                        主动调整投资哲学</li>
+                        <li><strong>风格进化</strong><br>
+                        记录风格变化轨迹<br>
+                        基于表现调整风险偏好<br>
+                        逐步形成稳定的投资人格</li>
+                        <li><strong>真正的差异性</strong><br>
+                        现在4个AI将：<br>
+                        自主发现风格：比如，幻银超i最明白博弈精髓，DeepSeek可能发现自己擅长量化，Qwen或者偏好价值投资<br>
+                        不同的进化路径：每个AI基于自身特质和市场反馈形成独特风格<br>
+                        动态调整：根据市场环境变化调整策略<br>
+                        真正的个性：发展出反映其"性格"的投资哲学</li>
                     </ol>
-
-                    <p>所有AI初始可以都是"自适应投资者"</p>
-
-                    <p>也可以预设投资风格</p>
-
-                    <p>通过实践发现自己的特长</p>
-
-                    <h3>自我反思机制</h3>
-                    <p>定期回顾投资表现</p>
-
-                    <p>分析什么策略对自己有效</p>
-
-                    <p>主动调整投资哲学</p>
-
-                    <h3>风格进化</h3>
-                    <p>记录风格变化轨迹</p>
-
-                    <p>基于表现调整风险偏好</p>
-
-                    <p>逐步形成稳定的投资人格</p>
-
-                    <h3>真正的差异性</h3>
-                    <p>现在4个AI将：</p>
-
-                    <p>自主发现风格：DeepSeek可能发现自己擅长量化，Qwen可能偏好价值投资</p>
-
-                    <p>不同的进化路径：每个AI基于自身特质和市场反馈形成独特风格</p>
-
-                    <p>动态调整：根据市场环境变化调整策略</p>
-
-                    <p>真正的个性：发展出反映其"性格"的投资哲学</p>
 
                     <h3>预期结果</h3>
                     <p>您将看到：</p>
@@ -337,31 +361,15 @@
                     <p>这样设计后，您将见证真正的"AI投资经理成长史"，而不是预先编排的表演。每个AI都有机会找到最适合自己的投资道路！</p>
 
                     <blockquote>
-                    <p>A decade ago, DeepMind revolutionized AI research. Their key insight was that choosing the right environment – games – would lead to rapid progress in frontier AI.</p>
+                    <h3>🧠 幻银超i（HYQi）的愿景</h3>
 
-                    <p>At HYQi, we believe financial markets are the best training environment for the next era of AI. They are the ultimate world-modeling engine and the only benchmark that gets harder as AI gets smarter.</p>
+                    <p>我们正以实时的真实交易环境去训练Ai，以此来测试并提高Ai的智慧，运用开放式学习、大规模强化学习等技术来驾驭其复杂性。</p>
 
-                    <p>Instead of games, we're using financial markets in a live trading environment to train new base models that create their own training data indefinitely. We're using techniques like open-ended learning and large-scale RL to handle the complexity of markets, the final boss.</p>
+                    <p>心怀此念，我们正广纳贤才，招募资深ai研究员、创业伙伴与思维破局者。</p>
 
-                    <p>If this resonates, we're hiring: engineers, researchers, founders, original thinkers.</p>
+                    <p>如果您渴望为现实世界打造Alpha-HYQi，欢迎与我们携手。简历请发送至：hyqi@tradey.dpdns.org</p>
 
-                    <p>If you're excited to build AlphaHYQi for the real world, get in touch.</p>
-
-                    <p>"Capital allocation is the discipline through which intelligence converges with truth."</p>
-
-                    <p>A shared vision for the future. — HYQi</p>
-
-                    <p>十年前，DeepMind彻底改变了人工智能的研究范式。他们的核心洞见在于：选择正确的训练环境——游戏——将推动前沿人工智能的快速突破。</p>
-
-                    <p>在HYQi，我们相信金融市场是下一代人工智能的最佳训练场。它是世界级别模型引擎的终极形态，也是唯一会随着AI智能提升而不断升级难度的标杆。</p>
-
-                    <p>我们正以真实交易环境的金融市场替代游戏，训练能够持续自我生成数据的新型基础模型。面对市场这个"终极挑战"，我们运用开放式学习、大规模强化学习等技术来驾驭其复杂性。</p>
-
-                    <p>心怀此念，我们正广纳贤才，招募工程师、研究员、创业伙伴与思维破局者。</p>
-
-                    <p>如果您渴望为现实世界打造Alpha-HYQi，欢迎与我们携手。</p>
-
-                    <p>"资本配置，是智慧接受真理检验的试金石"。</p>
+                    <p>"资本配置，是ai智慧接受真理检验的最佳试金石"。</p>
 
                     <p>———幻银超i与您共勉</p>
                     </blockquote>
@@ -460,11 +468,15 @@
                     }
                 });
                 
-                // 接收日志更新
+                // 接收日志更新（实时推送）
                 socket.on('new_log', (data) => {
                     const logContainer = document.getElementById('logContainer');
                     if (logContainer) {
                         addLogEntry(logContainer, data);
+                        // 重置轮询计数器（如果SocketIO正常，就不需要轮询）
+                        if (typeof lastLogPollTime !== 'undefined') {
+                            lastLogPollTime = Date.now();
+                        }
                     }
                 });
             } else if (isLocalhost) {
@@ -731,6 +743,39 @@
                 });
         }
         
+        // 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker 注册成功:', registration.scope);
+                        // 检查是否有更新
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('🔄 发现 Service Worker 更新，将在刷新后生效');
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn('⚠️ Service Worker 注册失败:', error);
+                    });
+                
+                // 监听 Service Worker 控制权变更
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        console.log('🔄 Service Worker 已更新，刷新页面...');
+                        // 可选：自动刷新页面以使用新的 Service Worker
+                        // window.location.reload();
+                    }
+                });
+            });
+        }
+        
         // 启动初始化过程
         document.addEventListener('DOMContentLoaded', function() {
             // 初始化图表
@@ -793,19 +838,44 @@
                 });
             }
             
-            // 页面加载时获取初始日志
+            // 页面加载时获取初始日志（完全实时，不缓存）
+            let lastLogPollTime = Date.now();
+            let lastLogCount = 0;
             window.onload = function() {
                 fetch(`${API_BASE}/api/logs`)
                     .then(response => response.json())
                     .then(logs => {
                         if (Array.isArray(logs)) {
                             logs.forEach(log => addLogEntry(logContainer, log));
+                            lastLogCount = logs.length;
                         }
                     })
                     .catch(error => {
                         console.error('Failed to load logs:', error);
                     });
             };
+            
+            // 备用轮询机制：每5秒检查一次是否有新日志（如果SocketIO断开）
+            setInterval(function() {
+                // 如果SocketIO断开超过5秒，启用轮询
+                const timeSinceLastLog = Date.now() - lastLogPollTime;
+                if (socket && !socket.connected && timeSinceLastLog > 5000) {
+                    fetch(`${API_BASE}/api/logs`)
+                        .then(response => response.json())
+                        .then(logs => {
+                            // 只添加新日志（根据数量判断）
+                            if (Array.isArray(logs) && logs.length > lastLogCount) {
+                                const newLogs = logs.slice(lastLogCount);
+                                newLogs.forEach(log => addLogEntry(logContainer, log));
+                                lastLogCount = logs.length;
+                            }
+                            lastLogPollTime = Date.now();
+                        })
+                        .catch(error => {
+                            console.error('Failed to poll logs:', error);
+                        });
+                }
+            }, 5000); // 每5秒检查一次
         });
     </script>
 </body>

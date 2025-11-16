@@ -47,7 +47,7 @@
 ## 安装使用
 
 1. **安装及启动**
-   稍晚将打包成桌面exe软件，可直接下载运行，提供长达3个月的免费内测，使用者提供反馈被采纳，将可获取专业的技术支持和长期使用权。预约邮箱：hyqi@tradey.dpdns.org，请发送您的联系方式、简短介绍并说明使用目的，我们将根据您的邮件内容决定是否安排内测试用。
+   项目已打包成桌面exe软件，可直接下载运行，提供长达3个月的免费内测，使用者提供反馈被采纳，将可获取专业的技术支持和长期使用权。预约邮箱：hyqi@tradey.dpdns.org，请Star项目（点右上五角星Star）后，发送您的联系方式、简短介绍并说明使用目的，我们将根据您的邮件内容决定是否安排内测试用，如您获得内测资格将在3-5个工作日左右邮件通知。
 
    启动方法很简单：傻瓜式，无需python基础
    下载Releases安装包，解压，将user_config.json.example重命名为user_config.json，填写参数
@@ -113,3 +113,148 @@
 "资本配置，是ai智慧接受真理检验的最佳试金石"。
 
 ———幻银超i与您共勉
+
+📞 支持与社区
+💬 讨论交流: GitHub Discussions
+🐛 问题反馈: GitHub Issues
+
+📜 许可证条款
+1. 开源核心模块（MIT 许可证）
+开源部分源代码（位于本仓库 ./codes目录下）基于 MIT 许可证 授权，你享有以下权利：
+自由使用、复制、修改、合并、发布、分发、再授权及出售开源核心代码的副本；
+将开源核心代码集成到个人 / 商业项目（包括闭源项目），但需保留原始版权声明和 MIT 许可证文本。
+完整许可证文本：LICENSE
+2. 商业闭源模块
+商业模块（包括但不限于打包成exe文件内嵌的所有模块）受版权保护，基于 商业许可证 提供，核心条款如下：
+使用需获得有效商业授权（联系我们获取订阅 / 授权方案）；
+禁止未经授权分发、反编译、逆向工程或转售商业模块；
+商业模块仅可与本项目的开源核心模块搭配使用，不可单独使用或集成到其他未授权项目。
+完整商业许可证详情：LICENSE-COMMERCIAL（购买授权后提供）
+
+🤝 贡献指南
+我们欢迎对开源核心模块的贡献！贡献步骤：
+Fork 本仓库；
+仅在 ./codes 目录下修改代码；
+提交 Pull Request，并清晰描述修改内容。
+详细贡献规则：CONTRIBUTING.md
+注意：商业模块为闭源性质，不接受外部代码贡献。
+
+📞 联系与支持
+开源核心用户
+问题反馈：通过 GitHub Issues 提交开源核心模块相关的 Bug 报告或功能需求；
+社区交流：加入我们的 [GitHub Discussions] 参与讨论。
+商业授权用户
+技术支持：通过 [hyqi@tradey.dpdns.org] 联系专属支持团队（24 小时内响应）；
+授权咨询：发送邮件至 [hyqi@tradey.dpdns.org]，了解定价、订阅方案或定制授权服务。
+
+⚠️ 免责声明
+开源核心模块基于 MIT 许可证以 “原样” 提供，不提供任何明示或暗示的担保（详见完整 MIT 许可证文本）；
+商业模块将按照许可证协议提供技术支持，但不保证与所有自定义环境兼容；
+双许可证模式可能会调整，任何更新将在本 README 中公示，并通知商业授权用户。
+© [2025] 幻银超i 保留所有权利。开源核心模块基于 MIT 许可证授权。商业模块基于商业许可证授权。
+
+![GitHub Stars Trend](https://img.shields.io/github/stars/hyqibot/A-share-Ai?style=social&label=Stars&logo=github&color=yellow)
+![Star Growth Curve](https://api.star-history.com/svg?repos=hyqibot/A-share-Ai&type=Date)
+
+
+A-share-Ai: Phantom Silver Quantitative AI Trading System for A-Shares
+
+An automated A-share trading system powered by four major domestic large language models (HYQi Phantom Silver Ultra-i, DeepSeek, Qwen, Doubao), supporting full-market stock selection and live trading.
+Key Features
+🎯 Let AI showcase its capabilities in the A-share market—multiple large language models make fully autonomous decisions and compete against each other across all A-share stocks!
+🎯 Connect to real A-share trading accounts, display the AI's real trading process in real time. Real-time + real trading expands the system's application scenarios.
+🎯 Multi-model Integration: Supports HYQi Phantom Silver Ultra-i, DeepSeek, Qwen, Doubao, and other large language models.
+🎯 Strategy Evolution: Based on trading performance, AI models continuously optimize their investment strategies.
+⏰ Second-level Live Trading Support - Connect to live trading with second-level precision.
+🚀 Service Deployment & Parallel Execution - Deploy production services + parallel model execution.
+🎨 AI Trading Logic Visualization - Detailed trading log visualization (full trading process display).
+🎯 Core Feature: 100% AI autonomous decision-making with zero human intervention. AI strategies self-discover, self-train, and self-evolve.
+🎯 Special Function: Real-time human intervention and interaction with AI during trading (optional), adapting to real-world scenarios of large-scale investments.
+🎯 Newly added asynchronous execution to improve system speed.
+🤖 4-Model Parallelism: Simultaneous operation of HYQi Phantom Silver Ultra-i, DeepSeek, Qwen, and Doubao to compare returns.📈 Full-Market Stock Selection: AI independently selects promising stocks from the entire market, with customizable stock pools (optional).💹 Real-Time Market Data: Integrates real-time A-share data for AI use in actual trading.💹 Historical Market + Financial Data: Integrates A-share historical market and financial data for AI analysis and training.🎯 Intelligent Trading: Generates buy/sell signals based on AI analysis and executes trades fully automatically.🌈 Multiple Strategies: Includes trend following, moving average strategies, technical indicator strategies, quantitative arbitrage strategies, etc.—fully selected and continuously evolved by AI.📊 Real-Time Monitoring: UI interface displays real-time profit curves and trading logs.🔒 Risk Control: Built-in position control and stop-loss mechanisms.
+📊 AI Stock Trading Competition Rankings, Real-Time Returns & Decision Logs, Real-Time Portfolio
+
+[![AI Stock Trading Competition Historical Ranking (Fund Operation)](https://img.shields.io/badge/📈_AI Stock Trading Competition Historical Ranking (Fund Operation)-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reports/report.html)
+
+[![AI Stock Trading Competition Historical Ranking (Full Market)](https://img.shields.io/badge/📈_AI Stock Trading Competition Historical Ranking (Full Market)-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reportsall/report.html)
+
+[![Real-Time Returns & Decision Logs](https://img.shields.io/badge/🎯_Real-Time Returns & Decision Logs-Dashboard-green?style=for-the-badge&logo=chart-line)](https://hyqibot.github.io/A-share-Ai/)
+
+[![Real-Time Portfolio](https://img.shields.io/badge/📊_Real-Time Portfolio-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
+
+Installation & Usage
+1. Installation & Launch
+The project is packaged as a desktop EXE application, which can be downloaded and run directly. A 3-month free closed beta is provided. Users whose feedback is adopted will receive professional technical support and long-term usage rights. Reservation email: hyqi@tradey.dpdns.org. Please Star the project (click the star icon in the upper right corner), then send your contact information, a brief introduction, and an explanation of your usage purpose. We will decide whether to arrange closed beta access based on your email content. If you are granted closed beta qualification, you will be notified by email within 3-5 working days.
+Launch is simple: No Python experience required (beginner-friendly).
+Download the installation package from Releases and unzip it.
+Rename user_config.json.example to user_config.json and fill in the parameters.
+Required parameters include:
+Installation path and account of your real trading account. Professional trading APIs are supported (inquire via official email), compatible with QMT and Tonghuashun trading platforms of major securities firms.
+Local path of your custom stock pool (Tongdaxin format).
+API keys for large models such as DeepSeek.
+License: hyqibot
+Save the filled parameters, right-click to run the unzipped EXE file as an administrator, and click "Start Trading" on the GUI.
+Core Leap: True AI Self-Discovery
+1. Start from Scratch or User-Defined Style
+All AIs can start as "adaptive investors" initially.
+Investment styles can also be preset.
+Discover their own strengths through practice.
+2. Self-Reflection Mechanism
+Regularly review investment performance.
+Analyze which strategies work for themselves.
+Proactively adjust investment philosophy.
+3. Style Evolution
+Record the trajectory of style changes.
+Adjust risk appetite based on performance.
+Gradually form a stable investment personality.
+4. True Differentiation
+Now the 4 AIs will:
+Autonomously discover styles: For example, HYQi Phantom Silver Ultra-i masters the essence of trading, DeepSeek may excel in quantitative analysis, and Qwen might prefer value investing.
+Different evolutionary paths: Each AI forms a unique style based on its own characteristics and market feedback.
+Dynamic adjustment: Adapt strategies to changes in market conditions.
+True individuality: Develop an investment philosophy that reflects its "personality."
+Expected Outcomes
+You will witness:
+True AI individuality: Each AI develops a unique investment identity.
+Dynamic style evolution: Investment styles change with experience accumulation.
+Performance-based adjustments: Successful strategies are retained, failed ones are eliminated.
+Unpredictable results: It is impossible to predict which style each AI will develop in advance.
+With this design, you will witness a true "AI investment manager growth journey" rather than a pre-scripted performance. Each AI has the opportunity to find the most suitable investment path!
+🧠 Vision of HYQi Phantom Silver Ultra-i
+We are training AI in a real-time, real trading environment to test and enhance its intelligence, leveraging technologies such as open-ended learning and large-scale reinforcement learning to harness its complexity.
+With this vision, we are actively recruiting senior AI researchers, entrepreneurial partners, and visionary thinkers.
+If you aspire to build Alpha-HYQi for the real world, we welcome you to join us. Please send your resume to: hyqi@tradey.dpdns.org
+"Capital allocation is the best touchstone for AI intelligence to be tested by truth."
+—— Together with HYQi Phantom Silver Ultra-i
+📞 Support & Community💬 Discussions: GitHub Discussions🐛 Issues: GitHub Issues
+📜 License Terms
+1. Open-Core Module (MIT License)
+The open-source source code (located in the ./codes directory of this repository) is licensed under the MIT License. You are granted the following rights:
+Freely use, copy, modify, merge, publish, distribute, sublicense, and sell copies of the open-core code.
+Integrate the open-core code into personal/commercial projects (including closed-source projects), provided that the original copyright notice and MIT License text are retained.
+Full license text: LICENSE
+2. Commercial Closed-Source Modules
+Commercial modules (including but not limited to all modules embedded in the packaged EXE file) are protected by copyright and provided under a Commercial License. Key terms are as follows:
+Usage requires a valid commercial license (contact us for subscription/authorization plans).
+Unauthorized distribution, decompilation, reverse engineering, or resale of commercial modules is prohibited.
+Commercial modules may only be used in conjunction with the open-core module of this project, and shall not be used independently or integrated into other unauthorized projects.
+Full commercial license details: LICENSE-COMMERCIAL (provided upon license purchase)
+🤝 Contributing GuidelinesWe welcome contributions to the open-core module! Contribution steps:
+Fork this repository.
+Modify code only in the ./codes directory.
+Submit a Pull Request with a clear description of changes.
+Detailed contribution rules: CONTRIBUTING.md
+Note: Commercial modules are closed-source and do not accept external code contributions.
+📞 Contact & Support
+For Open-Core Users
+Issue Reporting: Submit bug reports or feature requests related to the open-core module via GitHub Issues.
+Community Discussion: Join our [GitHub Discussions] to participate in discussions.
+For Commercial License Users
+Technical Support: Contact the dedicated support team via [hyqi@tradey.dpdns.org] (response within 24 hours).
+License Inquiries: Send an email to [hyqi@tradey.dpdns.org] to learn about pricing, subscription plans, or custom authorization services.
+⚠️ Disclaimer
+The open-core module is provided "as is" under the MIT License, without any express or implied warranties (see the full MIT License for details).
+Commercial modules will be provided with technical support in accordance with the license agreement, but compatibility with all custom environments is not guaranteed.
+The dual-license model is subject to change. Any updates will be announced in this README and notified to commercial license holders.
+© [2025] HYQi Phantom Silver Ultra-i. All rights reserved. Open-Core Module Licensed under MIT License. Commercial Modules Licensed under Commercial License.
+
