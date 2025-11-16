@@ -6,13 +6,14 @@ const API_BASE_URL = 'https://your-random-id.ts.net';
 window.API_CONFIG = {
     baseUrl: API_BASE_URL,
     endpoints: {
-        performance: '/performance_update',
+		performance: '/api/performance',
+		performanceFull: '/api/performance_full',
         tradeHistory: '/api/trade_history',
         performanceHistory: '/api/performance_history',
         currentPositions: '/api/current_positions',
         tradeStatistics: '/api/trade_statistics',
         models: '/api/models',
-        aiLog: '/ai_log'
+		aiLog: '/api/logs'
     }
 };
 
