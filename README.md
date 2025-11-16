@@ -44,9 +44,8 @@
 [![实时投资组合](https://img.shields.io/badge/📊_实时投资组合-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
 
 
-## 安装使用
 
-1. **安装及启动**
+**安装及启动**
    项目已打包成桌面exe软件，可直接下载运行，提供长达3个月的免费内测，使用者提供反馈被采纳，将可获取专业的技术支持和长期使用权。预约邮箱：hyqi@tradey.dpdns.org，请Star项目（点右上五角星Star）后，发送您的联系方式、简短介绍并说明使用目的，我们将根据您的邮件内容决定是否安排内测试用，如您获得内测资格将在3-5个工作日左右邮件通知。
 
    启动方法很简单：傻瓜式，无需python基础
@@ -130,6 +129,7 @@
 将开源核心代码集成到个人 / 商业项目（包括闭源项目），但需保留原始版权声明和 MIT 许可证文本。
 
 完整许可证文本：LICENSE
+
 2. 商业闭源模块
 商业模块（包括但不限于打包成exe文件内嵌的所有模块）受版权保护，基于 商业许可证 提供，核心条款如下：
 
@@ -223,7 +223,6 @@ Key Features
 
 
 Installation & Usage
-1. Installation & Launch
 
 The project is packaged as a desktop EXE application, which can be downloaded and run directly. A 3-month free closed beta is provided. Users whose feedback is adopted will receive professional technical support and long-term usage rights. Reservation email: hyqi@tradey.dpdns.org. Please Star the project (click the star icon in the upper right corner), then send your contact information, a brief introduction, and an explanation of your usage purpose. We will decide whether to arrange closed beta access based on your email content. If you are granted closed beta qualification, you will be notified by email within 3-5 working days.
 
@@ -235,6 +234,7 @@ Installation path and account of your real trading account. Professional trading
 Local path of your custom stock pool (Tongdaxin format).
 API keys for large models such as DeepSeek.
 License: hyqibot
+
 Save the filled parameters, right-click to run the unzipped EXE file as an administrator, and click "Start Trading" on the GUI.
 
 
@@ -260,61 +260,99 @@ Dynamic adjustment: Adapt strategies to changes in market conditions.
 True individuality: Develop an investment philosophy that reflects its "personality."
 
 Expected Outcomes
+
 You will witness:
+
 True AI individuality: Each AI develops a unique investment identity.
+
 Dynamic style evolution: Investment styles change with experience accumulation.
+
 Performance-based adjustments: Successful strategies are retained, failed ones are eliminated.
+
 Unpredictable results: It is impossible to predict which style each AI will develop in advance.
+
 With this design, you will witness a true "AI investment manager growth journey" rather than a pre-scripted performance. Each AI has the opportunity to find the most suitable investment path!
 
 
 🧠 Vision of HYQi Phantom Silver Ultra-i
+
 We are training AI in a real-time, real trading environment to test and enhance its intelligence, leveraging technologies such as open-ended learning and large-scale reinforcement learning to harness its complexity.
+
 With this vision, we are actively recruiting senior AI researchers, entrepreneurial partners, and visionary thinkers.
+
 If you aspire to build Alpha-HYQi for the real world, we welcome you to join us. Please send your resume to: hyqi@tradey.dpdns.org
+
 "Capital allocation is the best touchstone for AI intelligence to be tested by truth."
+
 —— Together with HYQi Phantom Silver Ultra-i
 
 
 📞 Support & Community
+
 💬 Discussions: GitHub Discussions
+
 🐛 Issues: GitHub Issues
 
 
 📜 License Terms
 1. Open-Core Module (MIT License)
+
 The open-source source code (located in the ./codes directory of this repository) is licensed under the MIT License. You are granted the following rights:
+
 Freely use, copy, modify, merge, publish, distribute, sublicense, and sell copies of the open-core code.
+
 Integrate the open-core code into personal/commercial projects (including closed-source projects), provided that the original copyright notice and MIT License text are retained.
+
 Full license text: LICENSE
+
 2. Commercial Closed-Source Modules
+
 Commercial modules (including but not limited to all modules embedded in the packaged EXE file) are protected by copyright and provided under a Commercial License. Key terms are as follows:
+
 Usage requires a valid commercial license (contact us for subscription/authorization plans).
+
 Unauthorized distribution, decompilation, reverse engineering, or resale of commercial modules is prohibited.
+
 Commercial modules may only be used in conjunction with the open-core module of this project, and shall not be used independently or integrated into other unauthorized projects.
+
 Full commercial license details: LICENSE-COMMERCIAL (provided upon license purchase)
 
 
-🤝 Contributing GuidelinesWe welcome contributions to the open-core module! Contribution steps:
+🤝 Contributing Guidelines
+
+We welcome contributions to the open-core module! Contribution steps:
+
 Fork this repository.
+
 Modify code only in the ./codes directory.
+
 Submit a Pull Request with a clear description of changes.
+
 Detailed contribution rules: CONTRIBUTING.md
+
 Note: Commercial modules are closed-source and do not accept external code contributions.
 
 
 📞 Contact & Support
+
 For Open-Core Users
 Issue Reporting: Submit bug reports or feature requests related to the open-core module via GitHub Issues.
+
 Community Discussion: Join our [GitHub Discussions] to participate in discussions.
+
 For Commercial License Users
+
 Technical Support: Contact the dedicated support team via [hyqi@tradey.dpdns.org] (response within 24 hours).
+
 License Inquiries: Send an email to [hyqi@tradey.dpdns.org] to learn about pricing, subscription plans, or custom authorization services.
 
 
 ⚠️ Disclaimer
+
 The open-core module is provided "as is" under the MIT License, without any express or implied warranties (see the full MIT License for details).
+
 Commercial modules will be provided with technical support in accordance with the license agreement, but compatibility with all custom environments is not guaranteed.
+
 The dual-license model is subject to change. Any updates will be announced in this README and notified to commercial license holders.
 
 © [2025] HYQi Phantom Silver Ultra-i. All rights reserved. Open-Core Module Licensed under MIT License. Commercial Modules Licensed under Commercial License.
