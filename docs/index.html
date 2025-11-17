@@ -413,6 +413,7 @@
         // Tailscale Funnel 支持 WebSocket，可以实现实时推送
         let socket = null;
         let useSocketIO = false;
+        let chart = null;
         
         try {
             // Socket.IO 库可用且不是本地地址时，尝试连接
@@ -779,7 +780,6 @@
         // 启动初始化过程
         document.addEventListener('DOMContentLoaded', function() {
             // 初始化图表
-            let chart = null;
             const chartInitInterval = setInterval(() => {
                 const newChart = initChart();
                 if (newChart) {
