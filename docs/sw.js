@@ -1,5 +1,5 @@
 // Service Worker 版本号（更新时修改此版本号以强制更新）
-const CACHE_VERSION = 'v2.0.0';
+const CACHE_VERSION = 'v2.0.1';
 const CACHE_NAME = `ai-trader-${CACHE_VERSION}`;
 
 // 需要缓存的静态资源（使用相对路径，适配 GitHub Pages）
