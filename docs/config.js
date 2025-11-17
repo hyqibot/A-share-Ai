@@ -1,6 +1,6 @@
 // Tailscale Funnel URL 配置
 // 将 your-random-id.ts.net 替换为你的实际 Tailscale Funnel URL
-const API_BASE_URL = 'https://hhhh.tailc6a334.ts.net/';
+const API_BASE_URL = 'https://hhhh.tailc6a334.ts.net';
 
 // API 配置
 window.API_CONFIG = {
