@@ -614,9 +614,6 @@
                 logContainer.scrollTop = logContainer.scrollHeight;
                 
                 // 限制日志数量
-                if (logContainer.children.length > 500) {
-                    logContainer.removeChild(logContainer.firstChild);
-                }
             } catch (error) {
                 console.error('Error adding log entry:', error);
             }
