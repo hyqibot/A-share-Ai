@@ -5,6 +5,8 @@ const API_BASE_URL = 'https://hhhh.tailc6a334.ts.net';
 // API 配置
 window.API_CONFIG = {
     baseUrl: API_BASE_URL,
+	logPageSize: 100,
+	logLimit: null,
     endpoints: {
 		performance: '/api/performance',
 		performanceFull: '/api/performance_full',

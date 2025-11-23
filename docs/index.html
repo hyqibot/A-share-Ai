@@ -111,11 +111,10 @@
             flex: 1;
             min-height: 0;
         }
-        .logs-container h2 {
-            margin-top: 0;
-            flex-shrink: 0;
-            text-align: left;
-        }
+        .logs-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 10px;}
+        .logs-header h2{margin:0;flex:1;text-align:left;}
+        .logs-header button{background:#007acc;color:#fff;border:none;border-radius:4px;padding:6px 12px;font-size:12px;cursor:pointer;}
+        .logs-header button:disabled{opacity:.4;cursor:not-allowed;}
         #logContainer {
             flex: 1;
             overflow-y: auto;
@@ -378,7 +377,10 @@
             
             <div class="right-column">
                 <div class="logs-container">
-                    <h2>运行日志</h2>
+                    <div class="logs-header">
+                        <h2>运行日志</h2>
+                        <button id="loadMoreLogsBtn">加载更多历史</button>
+                    </div>
                     <div id="logContainer"></div>
                 </div>
             </div>
@@ -393,6 +395,12 @@
         // Socket.IO 服务器地址
         // Tailscale Funnel 通过 HTTPS 暴露 4000 端口，Socket.IO 会自动使用 WSS（WebSocket Secure）
         let SOCKET_URL = API_BASE;
+        const LOG_LIMIT=(window.API_CONFIG&&window.API_CONFIG.logLimit!==undefined)?Number(window.API_CONFIG.logLimit):null;
+        const LOG_PAGE_SIZE=(window.API_CONFIG&&window.API_CONFIG.logPageSize)||100;
+        const LOG_KEY_SET=new Set();
+        const logPagination={nextCursor:null,hasMore:true,loading:false};
+        let logContainerRef=null;
+        let loadMoreLogsBtn=null;
         if (!SOCKET_URL.startsWith('http')) {
             // 如果 URL 没有协议，添加 http://
             SOCKET_URL = `http://${SOCKET_URL}`;
@@ -595,28 +603,116 @@
             return logContainer;
         }
         
-        // 添加日志条目
-        function addLogEntry(logContainer, logEntry) {
-            try {
-                const logDiv = document.createElement('div');
-                logDiv.className = 'log-entry';
-                
-                const timestamp = logEntry.timestamp || new Date().toISOString();
-                const level = logEntry.level || 'INFO';
-                const message = logEntry.message || '';
-                
-                logDiv.innerHTML = `
-                    <span class="timestamp">${timestamp}</span>
-                    <span class="level ${level}">${level}</span>
-                    <span class="message">${message}</span>
-                `;
-                logContainer.appendChild(logDiv);
-                logContainer.scrollTop = logContainer.scrollHeight;
-                
-                // 限制日志数量
-            } catch (error) {
-                console.error('Error adding log entry:', error);
+        const buildLogKey=log=>`${log.timestamp||''}|${log.level||''}|${log.message||''}`;
+        function createLogNode(log){
+            const node=document.createElement('div');
+            node.className='log-entry';
+            const ts=log.timestamp||new Date().toISOString();
+            const level=log.level||'INFO';
+            const message=log.message||'';
+            node.dataset.logKey=buildLogKey({timestamp:ts,level,message});
+            node.innerHTML=`
+                <span class="timestamp">${ts}</span>
+                <span class="level ${level}">${level}</span>
+                <span class="message">${message}</span>
+            `;
+            return node;
+        }
+        function trimLogOverflow(container){
+            if(!LOG_LIMIT)return;
+            while(container.children.length>LOG_LIMIT){
+                const target=container.firstChild;
+                if(!target)break;
+                if(target.dataset&&target.dataset.logKey){LOG_KEY_SET.delete(target.dataset.logKey);}
+                container.removeChild(target);
             }
+        }
+        function appendLogBatch(container, logs, autoScroll=true){
+            try{
+                if(!Array.isArray(logs)||!logs.length)return;
+                const frag=document.createDocumentFragment();
+                let added=0;
+                logs.forEach(item=>{
+                    if(!item)return;
+                    const key=buildLogKey(item);
+                    if(LOG_KEY_SET.has(key))return;
+                    LOG_KEY_SET.add(key);
+                    frag.appendChild(createLogNode(item));
+                    added++;
+                });
+                if(!added)return;
+                container.appendChild(frag);
+                trimLogOverflow(container);
+                if(autoScroll)container.scrollTop=container.scrollHeight;
+            }catch(error){console.error('Error appending logs:',error);}
+        }
+        function prependLogBatch(container, logs){
+            try{
+                if(!Array.isArray(logs)||!logs.length)return;
+                const frag=document.createDocumentFragment();
+                let added=0;
+                logs.forEach(item=>{
+                    if(!item)return;
+                    const key=buildLogKey(item);
+                    if(LOG_KEY_SET.has(key))return;
+                    LOG_KEY_SET.add(key);
+                    frag.appendChild(createLogNode(item));
+                    added++;
+                });
+                if(!added)return;
+                const prev=container.scrollHeight;
+                container.insertBefore(frag, container.firstChild);
+                trimLogOverflow(container);
+                container.scrollTop += container.scrollHeight - prev;
+            }catch(error){console.error('Error prepending logs:',error);}
+        }
+        function addLogEntry(logContainer, logEntry){
+            appendLogBatch(logContainer,[logEntry],true);
+        }
+        function updateLoadMoreButton(){
+            if(!loadMoreLogsBtn)return;
+            const disabled=!logPagination.hasMore||LOG_LIMIT||logPagination.loading;
+            loadMoreLogsBtn.disabled=disabled;
+            loadMoreLogsBtn.textContent=disabled?'已加载全部日志':'加载更多历史';
+        }
+        function fetchLogs({loadOlder=false,silent=false}={}){
+            if(!logContainerRef)return Promise.resolve();
+            if(LOG_LIMIT){updateLoadMoreButton();return Promise.resolve();}
+            if(loadOlder&&(logPagination.nextCursor===null||!logPagination.hasMore))return Promise.resolve();
+            if(logPagination.loading)return Promise.resolve();
+            logPagination.loading=true;
+            updateLoadMoreButton();
+            const params=new URLSearchParams();
+            params.set('limit',LOG_PAGE_SIZE);
+            if(loadOlder&&logPagination.nextCursor!==null){params.set('cursor',logPagination.nextCursor);}
+            return fetch(`${API_BASE}/api/logs?${params.toString()}`,{
+                method:'GET',
+                headers:{
+                    'Content-Type':'application/json',
+                    'Cache-Control':'no-cache, no-store, must-revalidate',
+                    'Pragma':'no-cache',
+                    'Expires':'0'
+                },
+                cache:'no-store'
+            })
+                .then(r=>r.json())
+                .then(payload=>{
+                    const logs=Array.isArray(payload)?payload:(payload.logs||[]);
+                    if(loadOlder){prependLogBatch(logContainerRef,logs);}else{appendLogBatch(logContainerRef,logs,!silent);}
+                    if(!Array.isArray(payload)){
+                        logPagination.nextCursor=payload.next_cursor;
+                        logPagination.hasMore=payload.has_more;
+                    }else{
+                        logPagination.nextCursor=null;
+                        logPagination.hasMore=false;
+                    }
+                    updateLoadMoreButton();
+                })
+                .catch(err=>console.error('Failed to load logs:',err))
+                .finally(()=>{
+                    logPagination.loading=false;
+                    updateLoadMoreButton();
+                });
         }
         
         // 更新性能图表
@@ -815,6 +911,10 @@
             
             // 初始化日志容器
             const logContainer = initLogContainer();
+            logContainerRef=logContainer;
+            loadMoreLogsBtn=document.getElementById('loadMoreLogsBtn');
+            if(loadMoreLogsBtn){loadMoreLogsBtn.addEventListener('click',()=>fetchLogs({loadOlder:true}));}
+            updateLoadMoreButton();
             
             // Socket.IO 事件监听已在上面初始化时设置，这里不需要重复设置
             // 但我们可以添加一些额外的监听器用于调试
@@ -837,19 +937,8 @@
             
             // 页面加载时获取初始日志（完全实时，不缓存）
             let lastLogPollTime = Date.now();
-            let lastLogCount = 0;
             window.onload = function() {
-                fetch(`${API_BASE}/api/logs`)
-                    .then(response => response.json())
-                    .then(logs => {
-                        if (Array.isArray(logs)) {
-                            logs.forEach(log => addLogEntry(logContainer, log));
-                            lastLogCount = logs.length;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Failed to load logs:', error);
-                    });
+                fetchLogs().then(()=>{lastLogPollTime=Date.now();}).catch(()=>{});
             };
             
             // 备用轮询机制：每5秒检查一次是否有新日志（如果SocketIO断开）
@@ -857,20 +946,7 @@
                 // 如果SocketIO断开超过5秒，启用轮询
                 const timeSinceLastLog = Date.now() - lastLogPollTime;
                 if (socket && !socket.connected && timeSinceLastLog > 5000) {
-                    fetch(`${API_BASE}/api/logs`)
-                        .then(response => response.json())
-                        .then(logs => {
-                            // 只添加新日志（根据数量判断）
-                            if (Array.isArray(logs) && logs.length > lastLogCount) {
-                                const newLogs = logs.slice(lastLogCount);
-                                newLogs.forEach(log => addLogEntry(logContainer, log));
-                                lastLogCount = logs.length;
-                            }
-                            lastLogPollTime = Date.now();
-                        })
-                        .catch(error => {
-                            console.error('Failed to poll logs:', error);
-                        });
+                    fetchLogs({silent:true}).then(()=>{lastLogPollTime=Date.now();}).catch(()=>{});
                 }
             }, 5000); // 每5秒检查一次
         });
