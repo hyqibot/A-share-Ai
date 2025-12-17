@@ -1,4 +1,108 @@
-# 版本更新日志 - 2025-11-24，**版本**: v1.08  
+版本更新日志 - 2025-12-15，版本: v1.082
+
+1、Web页面收益曲线不随股价变化的根本原因
+在 ai_trading_engine.py 的 get_performance_summary() 方法中，收益率计算错误：
+'收益率%': round((perf.total_profit / perf.initial_capital) * 100, 2)
+这里使用的是 perf.total_profit，这是历史交易累计利润，只在每次实际买卖交易时更新，不会随着股价实时波动而变化。
+正确的计算方式：
+# 计算实时总资产 = 可用现金 + 实时持仓市值（持仓管理已实现，只是web页面没有同步）
+total_assets = self.portfolio_manager.calculate_total_assets(perf.available_cash, holdings_value)
+
+# 计算实时收益率 = (当前总资产 - 初始资金) / 初始资金 * 100%
+real_time_profit = total_assets - perf.initial_capital
+real_time_return_pct = round((real_time_profit / perf.initial_capital) * 100, 2)
+2、注释掉#logger.info("🕒 非交易时段（工作日 9:25-11:30, 13:00-15:00），仅刷新数据，不执行交易")
+避免非交易时段频繁过度输出
+
+3、取消胜率指标的计算及显示，因为胜率容易误导，大师一般是低胜率高收益，韭菜才喜欢高胜率
+
+4、除了web页面实时显示收益曲线外，每交易日的10:00和14:00输出一次实时估值日志          
+            now = datetime.now()
+            is_trading_day = now.weekday() < 5  # 周一到周五
+            is_key_time = now.hour in [10, 14] and now.minute == 0
+
+            if is_trading_day and is_key_time:
+                if not hasattr(self, f'_valuation_logged_{model_name}') or time.time() - getattr(self, f'_valuation_logged_{model_name}', 0) > 3600:  # 1小时间隔
+                    logger.info(f"💰 {model_name} 实时估值 - 总资产:{total_assets:.2f}, 持仓市值:{holdings_value:.2f}, 可用现金:{perf.available_cash:.2f}, 实时收益率:{real_time_return_pct:.2f}%, 持仓品种数:{len(positions_detail)}")
+                    setattr(self, f'_valuation_logged_{model_name}', time.time())
+
+5、完善持仓审视逻辑
+    新的持仓审视数据逻辑 (第2206-2235行)：
+    收集所有买入交易：遍历完整交易历史，收集每只股票的所有买入记录
+    第一次买入时间：按时间戳排序，取最早的买入时间
+    加权平均买入价格：(每笔买入价格 × 买入数量) / 总买入数量
+    准确的时间记录：反映真实的首次建仓时间，用于T+1规则判断
+
+    现在当AI进行持仓审视时，会收到明确的T+1规则提醒：
+    双重保障：除了代码层面的T+1过滤（当天买入的股票不会进入审视列表），AI在提示词层面也会收到明确提醒
+    规则强化：确保AI即使在决策过程中也会考虑交易规则的约束
+    合规性：进一步降低违反交易规则的风险
+
+6、允许日内多次交易、高频交易
+    可以缩短每轮间隔的时间，实现日内多次交易、高频交易。
+
+
+# 版本更新日志 - 2025-11-27，**版本**: v1.081  
+
+1、直接交易功能
+已添加到 ai_trading_engine.py（execute_direct_trade 方法）
+功能：
+绕过 AI 分析和信号筛选
+直接执行买卖指令
+支持指定数量或使用默认仓位比例
+支持指定价格或使用当前市价
+自动应用涨跌停限制和滑点调整
+自动记录到交易历史和数据库
+实时显示执行结果
+友好的错误提示
+所有功能已集成到UI中，可在"直接交易"标签页使用。
+
+2. 批量直接交易 (execute_batch_direct_trades)
+位置：ai_trading_engine.py
+功能：一次提交多个交易指令
+特性：
+批量执行多个交易
+自动延迟（每笔交易间隔0.1秒）
+返回每笔交易的执行结果
+
+3. 条件交易 (execute_conditional_trade)
+位置：ai_trading_engine.py
+功能：支持价格和时间条件
+价格条件：
+高于指定价格
+低于指定价格
+价格区间
+时间条件：
+指定开始/结束时间
+指定工作日（周一到周五）
+
+4. UI集成
+新标签页："直接交易"
+包含三个功能区域：
+单笔直接交易
+选择模型、输入股票代码
+选择买入/卖出
+可选填写数量和价格
+一键执行
+批量直接交易
+多行文本输入框
+格式：模型名,股票代码,动作,数量(可选),价格(可选)
+示例：DeepSeek,000001,BUY,100
+条件交易
+设置价格条件（无/高于/低于/区间）
+设置时间条件（开始时间/结束时间/工作日）
+自动检测条件，满足后执行
+5. 使用示例
+批量交易输入格式：
+DeepSeek,000001,BUY,100Doubao,600000,SELL,200,10.50qwen,000002,BUY
+条件交易示例：
+价格条件：当000001价格高于10.00时买入
+时间条件：仅在交易时间（9:15-15:00）执行
+工作日：仅周一到周五
+
+
+
+# 版本更新日志 - 2025-11-24，**版本**: v1.08（首次稳定版）
 
 温馨提示：
 
