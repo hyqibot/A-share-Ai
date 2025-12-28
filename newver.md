@@ -1,4 +1,30 @@
-版本更新日志 - 2025-12-15，版本: v1.082
+版本更新日志 - 2025-12-28，版本: v1.09
+
+1、可实时变更自定义票池
+    用法：可将通达信预警或其他方式生成的通达信票池（比如用代码生成的量化票池或舆情热点）  实时喂给ai
+    # 检测通达信源文件的修改时间，而不是生成的JSON文件
+    current_mtime = os.path.getmtime(block_file_path)
+    last_mtime = self.trading_config.get('_custom_stock_pool_mtime', None)
+    # 转换为可读时间（UTC）
+    cdt = datetime.fromtimestamp(current_mtime)
+    ldt = datetime.fromtimestamp(last_mtime) if last_mtime is not None else 'None'
+
+    if last_mtime is None or current_mtime > last_mtime:
+        file_updated = True
+        logger.info(f"📁 检测到通达信自选股文件已更新，将重新生成自定义股票池 (修改时间: {ldt} -> {cdt})")
+
+2、修复bug，用户交互超时自动进入下一轮跨到非交易日，导致周六调用ai
+   每轮交易结束，接受用户交互结束后重新检查交易时段
+    if enable_trading_hours_check and not (is_weekday and (in_morning or in_afternoon)):
+        logger.info(f"📅 用户交互结束后检测到非交易时段，跳过交易: {now.strftime('%Y-%m-%d %H:%M:%S')} 星期{now.weekday()+1}")
+        perf_summary = self.get_performance_summary()
+        #time.sleep(self.trading_config.get('trading_interval', 119))
+        continue  # 跳过后续的交易执行逻辑
+
+3、软件服务商 编码重置，早前的所有版本失效，如需继续参加内测，请发邮件索取新版
+
+
+版本更新日志 - 2025-12-18，版本: v1.0821
 
 1、Web页面收益曲线不随股价变化的根本原因
 在 ai_trading_engine.py 的 get_performance_summary() 方法中，收益率计算错误：
@@ -11,6 +37,7 @@ total_assets = self.portfolio_manager.calculate_total_assets(perf.available_cash
 # 计算实时收益率 = (当前总资产 - 初始资金) / 初始资金 * 100%
 real_time_profit = total_assets - perf.initial_capital
 real_time_return_pct = round((real_time_profit / perf.initial_capital) * 100, 2)
+
 2、注释掉#logger.info("🕒 非交易时段（工作日 9:25-11:30, 13:00-15:00），仅刷新数据，不执行交易")
 避免非交易时段频繁过度输出
 
