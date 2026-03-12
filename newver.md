@@ -1,3 +1,67 @@
+版本更新日志 - 2026-03-10，版本: v1.20
+
+1、周六日暂停后周一交易需要等待timeout_seconds，解决方法：
+if self.trading_cycle > 0 and datetime.now().time() >= time(9, 26)::  # 不是第一轮才需要处理用户交互，添加条件and datetime.now().time() > time(9, 26)让周一9：25分直接自动进入交易而不卡在self._get_user_interaction中等待超时，timeout_seconds = self.trading_config.get('ui_interaction_timeout', getattr(self, 'ui_interaction_timeout', 300))  # 用户可配置的超时（默认5分钟）
+
+2、周六周日直接休眠到周一早上9点
+if enable_trading_hours_check and not (is_weekday and (in_morning or in_afternoon)):
+    # 控制日志输出频率：每天只输出一次非交易时段日志
+    today = now.strftime('%Y-%m-%d')
+    if not hasattr(self, '_last_non_trading_log_date') or self._last_non_trading_log_date != today:
+        logger.info("🕒 非交易时段（工作日 9:25-11:30, 13:00-15:00），仅刷新数据，不执行交易")
+        self._last_non_trading_log_date = today    
+
+    # 在非交易时段，仅刷新性能摘要，然后跳过交易执行
+    perf_summary = self.get_performance_summary()   
+    
+    # 判断是否为周末（周六或周日）
+    weekday = now.weekday()  # Monday=0, Sunday=6
+    is_weekend = weekday >= 5  # 5=周六, 6=周日
+
+    if is_weekend:
+        # 计算到下周一9点的秒数
+        from datetime import datetime, timedelta
+        
+        # 计算距离下周一的天数
+        days_until_monday = (7 - weekday) % 7
+        if days_until_monday == 0:  # 如果是周日，weekday=6，7-6=1天到周一
+            days_until_monday = 1
+        elif days_until_monday == 2:  # 如果是周六，weekday=5，7-5=2天到周一
+            days_until_monday = 2
+            
+        # 获取下周一早上9点的时间
+        next_monday = now + timedelta(days=days_until_monday)
+        next_target = datetime(next_monday.year, next_monday.month, next_monday.day, 9, 0, 0)
+        
+        # 计算需要休眠的秒数
+        sleep_seconds = (next_target - now).total_seconds()
+            
+        logger.info(f"周末非交易时段，将休眠到下周一9点（{next_target.strftime('%Y-%m-%d %H:%M')}），共 {sleep_seconds/3600:.2f} 小时")
+        time.sleep(sleep_seconds)
+    else:
+        # 工作日非交易时段，使用正常的交易间隔
+        sleep_time = self.trading_config.get('trading_interval', 119)
+        time.sleep(sleep_time)
+                    
+    continue  # 跳过后续的交易执行逻辑
+    
+3、A股交易开始时间统一为每天的9：25分，因为开盘价和现价9：25分才能获取
+
+4、接入钉钉频道，通过钉钉同时指挥四大ai，一句话让ai帮你毫秒完成股票买卖
+ **智能聊天（多模型）**：发送 `@模型名 你的问题`，机器人会调用对应大模型回复（只聊天不下单）。
+  - 示例：`@幻银超i 今天市场怎么看？`、`@deepseek 解释一下市盈率`
+- **AI 解析交易**：发送 `@iClaw 你的自然语言交易意图`，机器人会调用你文本中提到的模型瞬间完成交易
+  - 示例：`@iClaw 用幻银超i模型买入002961 1000股，价格26.9`
+
+5、接入远程桌面程序执行能力
+- **远程启动本地应用**：发送 `/runapp <应用别名或内置名称>`，由主程序在本机尝试启动白名单中的桌面应用。
+   - 别名通过 `user_config.json` 的 `APP_LAUNCH_CONFIG.aliases` 配置，例如 `"mytrader": "C:\\Users\\you\\Desktop\\MyTrader\\MyTrader.exe"`
+   - 对于 `notepad`、`calc` 等规范化程序，可直接 `/runapp notepad` 使用（也可通过 `builtin_allow` 扩展）
+
+6、预留skills接口，可接入更多能力
+   至此，本项目已经完全具备openclaw的全方位干活能力，特别在交易能力方面，独树一帜。
+
+
 版本更新日志 - 2026-01-18，版本: v1.10
 
 整整一个周末，团队都在加班优化我们的Alpha-HYQi，大家加油。
