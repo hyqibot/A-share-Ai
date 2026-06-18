@@ -1,8 +1,13 @@
-# 幻银量化A股阿法狗AlphaHYQi
+# 幻银量化A股AI交易系统A-share-Ai
 
 基于四大国内大模型（幻银超i、DeepSeek、通义千问、豆包）的A股自动交易系统，支持全市场选股和实盘交易。
 
 接入自产龙虾iClaw，手机端一句话同时控制四大模型全自动交易。
+
+## 交易执行说明
+
+- **买入**：按总资产×仓位比例计算金额，并受「单轮最多使用可用现金一定比例」限制。
+- **卖出（模型自动 SELL 信号）**：按当前持仓**全部卖出**，不受可用现金上限影响（避免资金紧张时卖单被算成 0 股）。
 
 ## 功能特性
 
@@ -35,6 +40,29 @@
 📊 **实时监控**：UI界面实时显示收益曲线和交易日志
 🔒 **风险控制**：内置仓位控制和止损机制
 
+## 📱 iClaw钉钉配置说明
+
+方法1（已取消）：启用 `config/dingtalk.json` 后，程序启动会提示先在钉钉私聊机器人发送一次 `/status` 完成绑定；绑定成功会自动把你的账号ID写入 `default_conversation_id`，后续每轮交易完成将自动推送到你的钉钉私聊（无需手动配置个人ID）。
+
+方法2：通过测试脚本或钉钉平台获取 `sender_id` 写入 `config/dingtalk.json` 的 `default_conversation_id` 字段，同时配置其他必要参数（见exampl文件），程序启动后会直接将每轮交易结果推送到该账号，同时实现钉钉对项目所有大模型的远端实时控制。
+
+> **Stream 长连接**：入站消息走 WebSocket Stream，出站通知走 REST API（二者独立）。若长时间收不到私聊指令但交易通知仍正常，日志中会出现 `Stream 已断开，10s 后重连...`；程序会自动重连，无需重启。
+
+## 💬 iClaw智能聊天与自然语言指令交易
+
+- **智能聊天（多模型）**：发送 `@模型名 你的问题`，机器人会调用对应大模型回复（只聊天不下单）。
+  - 示例：`@幻银超i 今天市场怎么看？`、`@deepseek 解释一下市盈率`
+- **自然语言指令AI交易**：发送 `@iClaw 你的自然语言交易意图`，机器人会调用你文本中提到的模型把意图翻译为 JSON 指令，经校验后复用 `/buy`、`/sell` 链路执行。
+  - 示例：`@iClaw 用幻银超i买入002961 1000股，价格26.9`
+- **/开头的指令交易**：  
+  - **买入/卖出**：`/buy [模型名] 股票代码 数量 [价格]`、`/sell [模型名] 股票代码 数量 [价格]`，模型名可省略。示例：`/buy 000001 1000`、`/sell 幻银超i 000001 500 27.0`
+  - **批量买入**：`/batch_buy [模型名] 股票代码:数量,股票代码:数量,...`，模型名可省略（省略则用默认模型）。示例：`/batch_buy 000001:1000,000002:500` 或 `/batch_buy 幻银超i 000001:1000,000002:500`
+  - **条件交易**：`/condition [模型名] 股票代码 条件 买入/卖出 [数量]`，模型名可省略。条件支持 `price>数字`、`price<数字`、`price_between 低 高`，示例：`/condition 000001 price>11 buy 1000` 或 `/condition 幻银超i 000001 price>11 buy 1000`；**数量可省略**：不写时买入按风险与可用资金自动算数量、卖出为全部持仓；若当下价格未满足条件，系统会在后台按交易轮次间隔持续监控，触发即按市价下单（默认有效期6小时）。**条件单监控在独立任务中运行，不占用主程序每轮交易循环**。创建后机器人会返回条件单ID，**撤销**：`/cancel <条件单ID>`（如 `/cancel COND-1734567890-000001`）。
+- **完整指令列表**：在钉钉中发送 `/help` 或 `/h` 可查看完整指令列表与示例。
+- **远程启动本地应用**：发送 `/runapp <应用别名或内置名称>`，由主程序在本机尝试启动白名单中的桌面应用。
+   - 别名通过 `user_config.json` 的 `APP_LAUNCH_CONFIG.aliases` 配置，例如 `"mytrader": "C:\\Users\\you\\Desktop\\MyTrader\\MyTrader.exe"`
+   - 对于 `notepad`、`calc` 这类规范化程序，可直接 `/runapp notepad` 使用（也可通过 `builtin_allow` 扩展）
+
 ## 📊 Ai炒股大赛排行榜、实时收益及决策日志、实时投资组合
 
 [![Ai炒股大赛历史排行榜(基金运作)](https://img.shields.io/badge/📈_Ai炒股大赛历史排行榜(基金运作)-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reports/report.html)
@@ -45,34 +73,45 @@
 
 [![实时投资组合](https://img.shields.io/badge/📊_实时投资组合-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
 
-## 📱 iClaw钉钉配置说明
+##更新或生成全市场股票池：python -m tools.generate_stock_list
 
-通过测试脚本或钉钉平台获取 `sender_id` 写入 `config/dingtalk.json` 的 `default_conversation_id` 字段，同时配置其他必要参数（见example文件），程序启动后会直接将每轮交易结果推送到该账号，同时实现钉钉对项目所有大模型的远端实时控制。
+##更新及打包全市场财务数据
+测试下载：设置 TEST_MODE=true 只下载2 只股票
+$env:TEST_MODE='true'; python -m tools.generate_financial_data
+要退出测试模式，可设置为 false 或删除该环境变量
+$env:TEST_MODE='false'; python -m tools.generate_financial_data
 
-## 💬 iClaw智能聊天与自然语言指令交易
+financial_data.json 是在交易界面的“下载所有A股财务数据”按钮触发 TradingUI._download_historical_data_background() 时生成的：它读取 stock_list.json、批量调用 stock_codes._get_financial_indicators_cached() 下载各股票财务指标，并把结果写入 stock_data/financial_data.json，每处理一批都会增量保存并支持断点续传。实现细节在 trading_ui.py：
+download_financial_data() 先检查 stock_data/financial_data.json 是否存在：若存在会完整读取到 financial_data_dict，随后每批下载完成都按 financial_data_dict[code] = ... 逐条覆盖或新增。写文件时 json.dump(...) 会把当前字典整体重写回原路径，因此：
+已有股票：会被最新下载结果覆盖（并非保留旧版）。
+原文件缺失的股票：成功下载后会被追加到字典中。
+也就是说它以“先加载旧数据 → 更新或新增 → 整体写回”的方式工作，逻辑上既保留旧条目、又能增量补全缺失股票，但最终文件每次都会被完整重写。
 
-- **智能聊天（多模型）**：发送 `@模型名 你的问题`，机器人会调用对应大模型回复（只聊天不下单）。
-  - 示例：`@幻银超i 今天市场怎么看？`、`@deepseek 解释一下市盈率`
-- **自然语言指令AI交易**：发送 `@iClaw 你的自然语言交易意图`，机器人会调用你文本中提到的模型把意图翻译为 JSON 指令，经校验后复用 `/buy`、`/sell` 链路执行。
-  - 示例：`@iClaw 用幻银超i模型买入002961 1000股，价格26.9`
-- **/开头的指令交易**：  
-  - **买入/卖出**：`/buy [模型名] 股票代码 数量 [价格]`、`/sell [模型名] 股票代码 数量 [价格]`，模型名可省略。示例：`/buy 000001 1000`、`/sell 幻银超i 000001 500 27.0`
-  - **批量买入**：`/batch_buy [模型名] 股票代码:数量,股票代码:数量,...`，模型名可省略（省略则用默认模型）。示例：`/batch_buy 000001:1000,000002:500` 或 `/batch_buy 幻银超i 000001:1000,000002:500`
-  - **条件交易**：`/condition [模型名] 股票代码 条件 买入/卖出 [数量]`，模型名可省略。条件支持 `price>数字`、`price<数字`、`price_between 低 高`，示例：`/condition 000001 price>11 buy 1000` 或 `/condition 幻银超i 000001 price>11 buy 1000`；**数量可省略**：不写时买入按风险与可用资金自动算数量、卖出为全部持仓；若当下价格未满足条件，系统会在后台按交易轮次间隔持续监控，触发即按市价下单（默认有效期6小时）。**条件单监控在独立任务中运行，不占用主程序每轮交易循环**。创建后机器人会返回条件单ID，**撤销**：`/cancel <条件单ID>`（如 `/cancel COND-1734567890-000001`）。
-- **完整指令列表**：在钉钉中发送 `/help` 或 `/h` 可查看完整指令列表与示例。
-- **远程启动本地应用**：发送 `/runapp <应用别名或内置名称>`，由主程序在本机尝试启动白名单中的桌面应用。
-   - 别名通过 `user_config.json` 的 `APP_LAUNCH_CONFIG.aliases` 配置，例如 `"mytrader": "C:\\Users\\you\\Desktop\\MyTrader\\MyTrader.exe"`
-   - 对于 `notepad`、`calc` 这类规范化程序，可直接 `/runapp notepad` 使用（也可通过 `builtin_allow` 扩展）
+打包阶段：main.spec 只是把 stock_data/financial_data.json 加进 datas，PyInstaller 运行时会把这些文件释放到临时目录 sys._MEIPASS/stock_data。
+运行阶段：stock_codes.load_local_data() 会判断是否是打包环境；若是，则先看 _MEIPASS/stock_data/financial_data.json，存在就直接用，不再继续往 exe 目录找；若那里没有，才退回到 exe_dir/stock_data/financial_data.json；若既无临时目录也无文件，才报缺失。
+因此：
+没打包该文件：exe 启动时 _MEIPASS 下找不到，会自动继续查 exe 同级的 stock_data/financial_data.json，你只要把文件放在 exe 旁边即可。
+打包了该文件：程序始终优先加载 _MEIPASS 里的版本，即便 exe 目录下也有同名文件，除非你删除临时目录文件或不随 exe 打包，才会回落到 exe 目录。
+
+## 📝 运行日志分页与批量拉取
+更新
+web_dashboard.py：/api/logs 新增游标分页（limit/cursor，可兼容旧无参请求），统一返回 logs/next_cursor/has_more/total，并抽象 _paginate_logs。
+templates/dashboard.html：日志面板新增“加载更多历史”、批量追加/前插+去重+可选上限（window.API_CONFIG.logPageSize/logLimit），Socket 断线回退 HTTP 时复用分页接口。
+docs/index.html：GitHub Pages 同步引入分页按钮与批次加载逻辑，保持与本地仪表板一致；轮询/初始化均切到 fetchLogs。
+docs/config.js：集中声明 logPageSize 与 logLimit，前端无需重复硬编码。
+
+- `/api/logs` 新增 `limit`（默认100）与 `cursor`（上一批起始索引）查询参数，响应包含 `logs`、`next_cursor`、`has_more` 等字段，便于分页或批量导出。
+- `docs/index.html` 与 `templates/dashboard.html` 已接入“加载更多历史”按钮，并由 `window.API_CONFIG.logPageSize / logLimit` 统一配置分页大小与可选上限。
+- Socket.IO 继续推送实时日志；断线时前端退回 HTTP 轮询，同样复用分页接口并自动去重，长时间运行也能完整回溯。
+
 
 **安装及启动**
-   项目已打包成windows桌面exe软件，可直接运行，内测结束，2026.3月起正式商用，申请方法：Star项目（点右上五角星Star）后发送您的github地址（必需）、联系方式、简短介绍到：hyqi@tradey.dpdns.org，审核通过后需购买服务卡方可使用，服务卡获取地址：https://www.hyqibot.com/。我们将根据您的邮件内容决定是否安排使用，如您通过审核将在3-5个工作日左右邮件通知。
+    项目已打包成windows桌面exe软件，可直接运行，内测结束，2026.3月起正式商用，申请方法：Star项目（点右上五角星Star）后发送您的github地址（必需）、联系方式、简短介绍到：hyqi@tradey.dpdns.org，审核通过后需购买服务卡方可使用，服务卡获取地址：https://www.hyqibot.com/。我们将根据您的邮件内容决定是否安排使用，如您通过审核将在3-5个工作日左右邮件通知。
 
    启动方法很简单：傻瓜式，无需python基础
    下载Releases安装包，解压，将user_config.json.example重命名为user_config.json，填写参数
    需要用到的参数有几类：1）真实交易账户的安装路径、账号，可接入专业交易api（另询官邮），兼容各大券商的QMT和同花顺交易；2）自选股票池通达信本地路径；3）deepseek等大模型api-key；4）licence：hyqibot
    填好参数保存，右键以管理员身份运行解压好的exe文件，图形界面上点击启动交易即可。
-   
-   温馨提示：1、新版请参考github上的newver.md文档获取更多帮助；2、上传3年1期最新财务数据文件financial_data.json，不想在ui页面下载者可自行获取，放到exe运行目录新建子目录stock_data下。
 
 ## 核心飞跃：真正的AI自我发现
 

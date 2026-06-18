@@ -1,3 +1,45 @@
+版本更新日志 - 2026-06-18，版本: v1.21
+1、卖出应全仓清仓（与回测一致），修正为卖出全部持仓，不再按手数向下取整。
+问题 ：SELL 被「调整交易金额」导致卖不出
+结论：是的，卖出不应走「可用现金×单轮上限」逻辑。
+
+根因链路：
+
+calculate_capital_per_trade() 对 BUY/SELL 一视同仁，把金额压到 available_cash × 0.5
+你的日志：128951.99 → 7315.97，再除以 225.82 并取整到 200 股一手 → 0 股
+卖出本来不需要占用现金，却被当成「买入资金」去封顶
+已改：
+
+新增 risk_manager.calculate_sell_amount()：按当前持仓全部卖出（与回测一致）
+ai_trading_engine.py 两处执行路径（模型信号 + 手动交易）均已分支：BUY 走资金风控，SELL 走持仓
+下次同类 SELL 日志会变成类似：
+
+📤 Doubao 卖出 603186: 持仓 xxx 股，卖出 xxx 股
+而不会再出现 调整交易金额以避免过度使用资金。
+
+2：钉钉入站无响应，出站仍正常
+入站 Stream（WebSocket）与出站 REST 是两条通道，Stream 断线后之前没有可靠重连。
+
+出站通知：send_message() + access token → HTTP，所以交易通知一直正常
+入站指令：Stream 长连接；connect() 若异常退出，_running 仍为 True，但已无 listener → 收不到消息、也没有 Received message 日志
+
+已改：
+
+文件	改动
+dingtalk/client.py
+外层重连循环；断开时关闭 websocket；日志 Stream 已断开，10s 后重连...
+dingtalk/channel.py
+_maintain_stream() 监督任务
+trading_ui.py
+每 30s 检查 Stream 任务，意外退出则重启
+README.md
+补充 Stream 重连说明 + 买卖执行规则
+
+重启程序后，若再断线，日志里应能看到重连提示，无需整程序重启。
+重启后私聊发 /status；若曾复现「收不到消息」，观察是否出现 Stream 已断开...重连 并恢复收消息
+
+
+
 版本更新日志 - 2026-03-10，版本: v1.20
 
 1、周六日暂停后周一交易需要等待timeout_seconds，解决方法：
@@ -60,6 +102,9 @@ if enable_trading_hours_check and not (is_weekday and (in_morning or in_afternoo
 
 6、预留skills接口，可接入更多能力
    至此，本项目已经完全具备openclaw的全方位干活能力，特别在交易能力方面，独树一帜。
+
+7、将法定节假日做成json列表，添加到交易时段检查中进行排除，并重置本更新中第二部的逻辑“休眠到周一早上”为“休眠到重新开市日早上9：25分”
+
 
 
 版本更新日志 - 2026-01-18，版本: v1.10
