@@ -4,10 +4,6 @@
 
 接入自产龙虾iClaw，手机端一句话同时控制四大模型全自动交易。
 
-## 交易执行说明
-
-- **买入**：按总资产×仓位比例计算金额，并受「单轮最多使用可用现金一定比例」限制。
-- **卖出（模型自动 SELL 信号）**：按当前持仓**全部卖出**，不受可用现金上限影响（避免资金紧张时卖单被算成 0 股）。
 
 ## 功能特性
 
@@ -73,40 +69,11 @@
 
 [![实时投资组合](https://img.shields.io/badge/📊_实时投资组合-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
 
-##更新或生成全市场股票池：python -m tools.generate_stock_list
-
-##更新及打包全市场财务数据
-测试下载：设置 TEST_MODE=true 只下载2 只股票
-$env:TEST_MODE='true'; python -m tools.generate_financial_data
-要退出测试模式，可设置为 false 或删除该环境变量
-$env:TEST_MODE='false'; python -m tools.generate_financial_data
-
-financial_data.json 是在交易界面的“下载所有A股财务数据”按钮触发 TradingUI._download_historical_data_background() 时生成的：它读取 stock_list.json、批量调用 stock_codes._get_financial_indicators_cached() 下载各股票财务指标，并把结果写入 stock_data/financial_data.json，每处理一批都会增量保存并支持断点续传。实现细节在 trading_ui.py：
-download_financial_data() 先检查 stock_data/financial_data.json 是否存在：若存在会完整读取到 financial_data_dict，随后每批下载完成都按 financial_data_dict[code] = ... 逐条覆盖或新增。写文件时 json.dump(...) 会把当前字典整体重写回原路径，因此：
-已有股票：会被最新下载结果覆盖（并非保留旧版）。
-原文件缺失的股票：成功下载后会被追加到字典中。
-也就是说它以“先加载旧数据 → 更新或新增 → 整体写回”的方式工作，逻辑上既保留旧条目、又能增量补全缺失股票，但最终文件每次都会被完整重写。
-
-打包阶段：main.spec 只是把 stock_data/financial_data.json 加进 datas，PyInstaller 运行时会把这些文件释放到临时目录 sys._MEIPASS/stock_data。
-运行阶段：stock_codes.load_local_data() 会判断是否是打包环境；若是，则先看 _MEIPASS/stock_data/financial_data.json，存在就直接用，不再继续往 exe 目录找；若那里没有，才退回到 exe_dir/stock_data/financial_data.json；若既无临时目录也无文件，才报缺失。
-因此：
-没打包该文件：exe 启动时 _MEIPASS 下找不到，会自动继续查 exe 同级的 stock_data/financial_data.json，你只要把文件放在 exe 旁边即可。
-打包了该文件：程序始终优先加载 _MEIPASS 里的版本，即便 exe 目录下也有同名文件，除非你删除临时目录文件或不随 exe 打包，才会回落到 exe 目录。
-
-## 📝 运行日志分页与批量拉取
-更新
-web_dashboard.py：/api/logs 新增游标分页（limit/cursor，可兼容旧无参请求），统一返回 logs/next_cursor/has_more/total，并抽象 _paginate_logs。
-templates/dashboard.html：日志面板新增“加载更多历史”、批量追加/前插+去重+可选上限（window.API_CONFIG.logPageSize/logLimit），Socket 断线回退 HTTP 时复用分页接口。
-docs/index.html：GitHub Pages 同步引入分页按钮与批次加载逻辑，保持与本地仪表板一致；轮询/初始化均切到 fetchLogs。
-docs/config.js：集中声明 logPageSize 与 logLimit，前端无需重复硬编码。
-
-- `/api/logs` 新增 `limit`（默认100）与 `cursor`（上一批起始索引）查询参数，响应包含 `logs`、`next_cursor`、`has_more` 等字段，便于分页或批量导出。
-- `docs/index.html` 与 `templates/dashboard.html` 已接入“加载更多历史”按钮，并由 `window.API_CONFIG.logPageSize / logLimit` 统一配置分页大小与可选上限。
-- Socket.IO 继续推送实时日志；断线时前端退回 HTTP 轮询，同样复用分页接口并自动去重，长时间运行也能完整回溯。
 
 
 **安装及启动**
-    项目已打包成windows桌面exe软件，可直接运行，内测结束，2026.3月起正式商用，获取方法：前往https://hyqibot.com/card-shop.html 购服务卡即可获得软件，如有疑问可发送您的github地址（必需）+简短介绍到：hyqi@tradey.dpdns.org，更多信息，可点：https://www.hyqibot.com/  有永久免token费的龙虾iclaw赠送。
+
+   项目已打包成windows桌面exe软件，可直接运行，内测结束，2026.3月起正式商用，获取方法：前往https://hyqibot.com/card-shop.html 购服务卡即可获得软件，如有疑问可发送您的github地址（必需）+简短介绍到：hyqi@tradey.dpdns.org，更多信息，可点：https://www.hyqibot.com/  有永久免token费的龙虾iclaw赠送。
 
    启动方法很简单：傻瓜式，无需python基础
    下载Releases安装包，解压，将user_config.json.example重命名为user_config.json，填写参数
