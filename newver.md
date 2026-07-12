@@ -1,3 +1,29 @@
+版本更新日志 - 2026-07-12，版本: v1.22
+1. 热加载 user_config.json
+每次 call_model() 前：检查 user_config.json 的 mtime，有变更则重载
+每轮交易开始时：_sync_runtime_config_from_file() 同步模型配置和 TRADING_CONFIG
+修改 api_key、model、base_url 等后无需重启，下一轮或下一次调用即生效
+2. 超时自动切换备用模型
+触发条件：TimeoutError、连接超时、连接错误等
+失败时：本轮剩余调用临时切到 「幻银超i」，并立即重试当前请求
+下一轮交易开始：ModelFallbackManager.on_trading_cycle_start() 自动恢复原模型
+修改的文件
+文件	改动
+config_manager.py
+reload_config_if_changed()、get_model_config_by_name()
+model_client.py
+ModelFallbackManager、热重载、call_model 备用切换
+ai_trading_engine.py
+注册客户端、每轮重置 fallback、同步配置
+
+举例：运行时你会看到的日志
+
+♻️ 检测到 user_config.json 变更，已热重载配置
+⚠️ 模型 Doubao 本轮交易将临时切换为备用模型 幻银超i
+🔁 模型 Doubao 调用失败，立即使用备用模型 幻银超i 重试
+♻️ 第 N 轮交易开始，恢复模型: Doubao
+
+
 版本更新日志 - 2026-06-18，版本: v1.21
 1、卖出应全仓清仓（与回测一致），修正为卖出全部持仓，不再按手数向下取整。
 问题 ：SELL 被「调整交易金额」导致卖不出
