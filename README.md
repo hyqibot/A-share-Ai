@@ -106,7 +106,7 @@ docs/config.js：集中声明 logPageSize 与 logLimit，前端无需重复硬�
 
 
 **安装及启动**
-    项目已打包成windows桌面exe软件，可直接运行，内测结束，2026.3月起正式商用，申请方法：Star项目（点右上五角星Star）后发送您的github地址（必需）、联系方式、简短介绍到：hyqi@tradey.dpdns.org，审核通过后需购买服务卡方可使用，服务卡获取地址：https://www.hyqibot.com/。我们将根据您的邮件内容决定是否安排使用，如您通过审核将在3-5个工作日左右邮件通知。
+    项目已打包成windows桌面exe软件，可直接运行，内测结束，2026.3月起正式商用，获取方法：前往https://hyqibot.com/card-shop.html 购服务卡即可获得软件，如有疑问可发送您的github地址（必需）+简短介绍到：hyqi@tradey.dpdns.org，更多信息，可点：https://www.hyqibot.com/  有永久免token费的龙虾iclaw赠送。
 
    启动方法很简单：傻瓜式，无需python基础
    下载Releases安装包，解压，将user_config.json.example重命名为user_config.json，填写参数
