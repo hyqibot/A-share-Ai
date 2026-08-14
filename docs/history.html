@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日级历史收益率</title>
+    <script src="config.js"></script>
+    <script src="js/sw-helper.js"></script>
+    <script src="js/cache-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+        .header {
+            background: #161b22;
+            color: #c9d1d9;
+            padding: 20px 40px;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            color: #f0f6fc;
+            margin: 0;
+            text-align: left;
+        }
+        .header-nav {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex: 1;
+        }
+        .header-nav a {
+            color: #8b949e;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 20px;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .header-nav a:hover, .header-nav a.active {
+            border-bottom-color: #f0883e;
+            color: #f0883e;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 40px 40px;
+        }
+        .filters {
+            background: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #21262d;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-group label {
+            font-weight: 500;
+            color: #c9d1d9;
+            min-width: 80px;
+        }
+        .filter-group select, .filter-group input {
+            padding: 8px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #c9d1d9;
+            min-width: 150px;
+        }
+        .filter-group button {
+            padding: 8px 20px;
+            background: #238636;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .filter-group button.secondary {
+            background: #21262d;
+            color: #c9d1d9;
+        }
+        .status-text {
+            color: #8b949e;
+            font-size: 13px;
+        }
+        .status-text.ok { color: #3fb950; }
+        .status-text.warn { color: #d29922; }
+        .status-text.error { color: #f85149; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #161b22;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #21262d;
+        }
+        .stat-card .label { font-size: 12px; color: #8b949e; margin-bottom: 8px; }
+        .stat-card .value { font-size: 24px; font-weight: 600; color: #f0f6fc; }
+        .stat-card .meta { font-size: 12px; color: #8b949e; margin-top: 6px; }
+        .positive { color: #3fb950; }
+        .negative { color: #f85149; }
+        .section {
+            background: #161b22;
+            border-radius: 8px;
+            border: 1px solid #21262d;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .section-header {
+            padding: 20px;
+            border-bottom: 1px solid #21262d;
+        }
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+        .chart-wrap {
+            height: 460px;
+            padding: 16px 20px 24px;
+        }
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead { background: #161b22; position: sticky; top: 0; z-index: 10; }
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #f0f6fc;
+            border-bottom: 2px solid #21262d;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #21262d;
+            color: #c9d1d9;
+        }
+        tbody tr:hover { background: #1c2128; }
+        .text-right { text-align: right; }
+        .loading, .empty { text-align: center; padding: 40px; color: #8b949e; }
+        .error {
+            background: #801f2f;
+            color: #ff7b72;
+            padding: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>日级历史收益率</h1>
+        <div class="header-nav">
+            <a href="history.html" class="active">日级历史收益率</a>
+            <a href="index.html">实时决策日志</a>
+            <a href="portfolio.html">实时投资组合</a>
+            <a href="reports/report.html">Ai历史排行(基金运作)</a>
+            <a href="reportsall/report.html">Ai历史排行(全市场)</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="filters">
+            <div class="filter-group">
+                <label>模型：</label>
+                <select id="modelFilter">
+                    <option value="">全部模型</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>开始日期：</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="filter-group">
+                <label>结束日期：</label>
+                <input type="date" id="endDate">
+            </div>
+            <div class="filter-group">
+                <button onclick="loadHistory()">查询</button>
+                <button class="secondary" onclick="resetFilters()">重置</button>
+            </div>
+            <span id="historyStatus" class="status-text">数据来源: logs/trades.db（按交易日汇总）</span>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>日级历史收益曲线</h2>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="historyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>日级收益明细</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>模型</th>
+                            <th class="text-right">累计收益率</th>
+                            <th class="text-right">总资产</th>
+                            <th class="text-right">累计盈亏</th>
+                            <th class="text-right">交易次数</th>
+                            <th class="text-right">持仓数</th>
+                            <th class="text-right">可用现金</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        <tr><td colspan="8" class="loading">正在加载数据...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/history.js"></script>
+</body>
+</html>
