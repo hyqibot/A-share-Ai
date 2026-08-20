@@ -435,7 +435,7 @@
                 borderWidth: 1,
                 pointRadius: pointR,
                 radius: pointR,
-                pointHoverRadius: 6,
+                pointHoverRadius: showFullData ? 4 : 6,
                 pointHitRadius: 16
             };
         }
@@ -452,6 +452,43 @@
                 }
             }
             return style;
+        }
+        function isLiveChartPoint(point) {
+            if (!point || typeof point !== 'object') return false;
+            if (point.source === 'live') return true;
+            if (point.source === 'history') return false;
+            return point.cycle == null && point.total_equity == null;
+        }
+        function filterLiveChartData(data) {
+            const result = {};
+            for (const [name, points] of Object.entries(data || {})) {
+                if (!Array.isArray(points)) {
+                    result[name] = points;
+                    continue;
+                }
+                result[name] = points.filter(isLiveChartPoint);
+            }
+            return result;
+        }
+        function chartTimeKey(value) {
+            return value == null ? '' : String(value);
+        }
+        function mergePerformanceData(existing, incoming) {
+            if (!existing) return incoming;
+            if (!incoming) return existing;
+            const merged = {};
+            const names = new Set([].concat(Object.keys(existing), Object.keys(incoming)));
+            names.forEach(function(name) {
+                const oldPts = Array.isArray(existing[name]) ? existing[name] : [];
+                const newPts = Array.isArray(incoming[name]) ? incoming[name] : [];
+                const byTime = {};
+                oldPts.concat(newPts).forEach(function(point) {
+                    if (!point || point.time == null) return;
+                    byTime[chartTimeKey(point.time)] = point;
+                });
+                merged[name] = Object.keys(byTime).sort().map(function(key) { return byTime[key]; });
+            });
+            return merged;
         }
         
         try {
@@ -618,6 +655,7 @@
                             borderWidth: 1
                         },
                         point: {
+                            radius: 4,
                             hoverRadius: 6,
                             hitRadius: 16
                         }
@@ -751,27 +789,49 @@
         }
         
         function sliceRecentChartPoints(data) {
-            const result = {};
+            const liveByModel = {};
+            const timeSet = {};
             for (const [name, points] of Object.entries(data || {})) {
+                if (!Array.isArray(points)) {
+                    liveByModel[name] = points;
+                    continue;
+                }
+                liveByModel[name] = points;
+                points.forEach(function(point) {
+                    if (point && point.time) timeSet[chartTimeKey(point.time)] = true;
+                });
+            }
+            const allTimes = Object.keys(timeSet).sort();
+            const recentTimes = allTimes.length > RECENT_CHART_POINTS
+                ? allTimes.slice(-RECENT_CHART_POINTS)
+                : allTimes;
+            const recentSet = {};
+            recentTimes.forEach(function(t) { recentSet[t] = true; });
+            const result = {};
+            for (const [name, points] of Object.entries(liveByModel)) {
                 if (!Array.isArray(points)) {
                     result[name] = points;
                     continue;
                 }
-                result[name] = points.length > RECENT_CHART_POINTS ? points.slice(-RECENT_CHART_POINTS) : points;
+                result[name] = points.filter(function(point) {
+                    return point && recentSet[chartTimeKey(point.time)];
+                });
             }
             return result;
         }
 
         function applyPerformanceChart(targetChart, data) {
             if (!targetChart || !data) return;
-            lastPerformanceData = data;
-            const display = showFullData ? data : sliceRecentChartPoints(data);
+            lastPerformanceData = mergePerformanceData(lastPerformanceData, data);
+            const live = filterLiveChartData(lastPerformanceData);
+            const display = showFullData ? live : sliceRecentChartPoints(live);
             updatePerformanceChart(targetChart, display);
         }
 
         function redrawPerformanceChart() {
             if (chart && lastPerformanceData) {
-                const display = showFullData ? lastPerformanceData : sliceRecentChartPoints(lastPerformanceData);
+                const live = filterLiveChartData(lastPerformanceData);
+                const display = showFullData ? live : sliceRecentChartPoints(live);
                 updatePerformanceChart(chart, display);
             }
         }
@@ -845,14 +905,20 @@
                         }
                     });
                     
-                    const dataset = Object.assign({
+                    const style = syncChartElementStyle(chart);
+                    const dataset = {
                         label: modelName,
                         data: profits,
                         borderColor: color,
                         backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
                         fill: false,
-                        tension: 0.4
-                    }, syncChartElementStyle(chart));
+                        tension: 0.4,
+                        borderWidth: 1,
+                        pointRadius: style.pointRadius,
+                        radius: style.pointRadius,
+                        pointHoverRadius: style.pointHoverRadius,
+                        pointHitRadius: style.pointHitRadius
+                    };
                     
                     chart.data.datasets.push(dataset);
                 }
