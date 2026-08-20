@@ -426,6 +426,9 @@
         let socket = null;
         let useSocketIO = false;
         let chart = null;
+        const RECENT_CHART_POINTS = 50;
+        let showFullData = false;
+        let lastPerformanceData = null;
         
         try {
             // Socket.IO 库可用且不是本地地址时，尝试连接
@@ -477,7 +480,7 @@
                 // 接收性能数据更新
                 socket.on('performance_update', (data) => {
                     if (chart) {
-                        updatePerformanceChart(chart, data);
+                        applyPerformanceChart(chart, data);
                     }
                 });
                 
@@ -719,6 +722,32 @@
                 });
         }
         
+        function sliceRecentChartPoints(data) {
+            const result = {};
+            for (const [name, points] of Object.entries(data || {})) {
+                if (!Array.isArray(points)) {
+                    result[name] = points;
+                    continue;
+                }
+                result[name] = points.length > RECENT_CHART_POINTS ? points.slice(-RECENT_CHART_POINTS) : points;
+            }
+            return result;
+        }
+
+        function applyPerformanceChart(targetChart, data) {
+            if (!targetChart || !data) return;
+            lastPerformanceData = data;
+            const display = showFullData ? data : sliceRecentChartPoints(data);
+            updatePerformanceChart(targetChart, display);
+        }
+
+        function redrawPerformanceChart() {
+            if (chart && lastPerformanceData) {
+                const display = showFullData ? lastPerformanceData : sliceRecentChartPoints(lastPerformanceData);
+                updatePerformanceChart(chart, display);
+            }
+        }
+
         // 更新性能图表
         function updatePerformanceChart(chart, data) {
             if (!chart || !data) return;
@@ -814,7 +843,7 @@
                 return;
             }
             
-            const url = `${API_BASE}/api/performance`;
+            const url = `${API_BASE}/api/performance_full`;
             fetch(url, {
                 method: 'GET',
                 headers: {
@@ -833,7 +862,7 @@
                 })
                 .then(data => {
                     if (chart) {
-                        updatePerformanceChart(chart, data);
+                        applyPerformanceChart(chart, data);
                     }
                 })
                 .catch(error => {
@@ -892,24 +921,16 @@
             }, 1000);
             
             // 添加切换显示数据的按钮事件监听器
-            let showFullData = false;
             const toggleButton = document.getElementById('toggleDataButton');
             if (toggleButton) {
                 toggleButton.addEventListener('click', function() {
                     showFullData = !showFullData;
                     toggleButton.textContent = showFullData ? '显示最近数据' : '显示全部数据';
-                    
-                    const url = showFullData ? `${API_BASE}/api/performance_full` : `${API_BASE}/api/performance`;
-                    fetch(url)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (chart) {
-                                updatePerformanceChart(chart, data);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Failed to load performance data:', error);
-                        });
+                    if (lastPerformanceData) {
+                        redrawPerformanceChart();
+                    } else {
+                        fetchPerformanceData();
+                    }
                 });
             }
             
