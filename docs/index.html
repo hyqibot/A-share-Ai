@@ -433,23 +433,47 @@
             const pointR = showFullData ? 0 : 4;
             return {
                 borderWidth: 1,
+                borderCapStyle: 'butt',
+                borderJoinStyle: 'miter',
+                tension: showFullData ? 0 : 0.4,
                 pointRadius: pointR,
                 radius: pointR,
                 pointHoverRadius: showFullData ? 4 : 6,
                 pointHitRadius: 16
             };
         }
+        function applyChartJsLineDefaults() {
+            if (typeof Chart === 'undefined' || !Chart.defaults) return;
+            if (Chart.defaults.elements && Chart.defaults.elements.line) {
+                Chart.defaults.elements.line.borderWidth = 1;
+                Chart.defaults.elements.line.borderCapStyle = 'butt';
+                Chart.defaults.elements.line.borderJoinStyle = 'miter';
+            }
+            if (Chart.defaults.datasets && Chart.defaults.datasets.line) {
+                Chart.defaults.datasets.line.borderWidth = 1;
+                Chart.defaults.datasets.line.borderCapStyle = 'butt';
+                Chart.defaults.datasets.line.borderJoinStyle = 'miter';
+            }
+        }
         function syncChartElementStyle(targetChart) {
             const style = chartPointStyle();
-            if (targetChart && targetChart.options && targetChart.options.elements) {
-                if (targetChart.options.elements.line) {
+            if (targetChart && targetChart.options) {
+                if (targetChart.options.elements && targetChart.options.elements.line) {
                     targetChart.options.elements.line.borderWidth = 1;
+                    targetChart.options.elements.line.borderCapStyle = 'butt';
+                    targetChart.options.elements.line.borderJoinStyle = 'miter';
+                    targetChart.options.elements.line.tension = style.tension;
                 }
-                if (targetChart.options.elements.point) {
+                if (targetChart.options.elements && targetChart.options.elements.point) {
                     targetChart.options.elements.point.radius = style.pointRadius;
                     targetChart.options.elements.point.hoverRadius = style.pointHoverRadius;
                     targetChart.options.elements.point.hitRadius = style.pointHitRadius;
                 }
+                if (!targetChart.options.datasets) targetChart.options.datasets = {};
+                if (!targetChart.options.datasets.line) targetChart.options.datasets.line = {};
+                targetChart.options.datasets.line.borderWidth = 1;
+                targetChart.options.datasets.line.borderCapStyle = 'butt';
+                targetChart.options.datasets.line.borderJoinStyle = 'miter';
             }
             return style;
         }
@@ -586,6 +610,7 @@
                 return;
             }
             
+            applyChartJsLineDefaults();
             console.log('Chart.js已加载，初始化图表');
             
             // 初始化图表
@@ -649,10 +674,19 @@
                             position: 'top',
                         }
                     },
+                    datasets: {
+                        line: {
+                            borderWidth: 1,
+                            borderCapStyle: 'butt',
+                            borderJoinStyle: 'miter'
+                        }
+                    },
                     elements: {
                         line: {
                             tension: 0.4,
-                            borderWidth: 1
+                            borderWidth: 1,
+                            borderCapStyle: 'butt',
+                            borderJoinStyle: 'miter'
                         },
                         point: {
                             radius: 4,
@@ -912,8 +946,10 @@
                         borderColor: color,
                         backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
                         fill: false,
-                        tension: 0.4,
+                        tension: style.tension,
                         borderWidth: 1,
+                        borderCapStyle: 'butt',
+                        borderJoinStyle: 'miter',
                         pointRadius: style.pointRadius,
                         radius: style.pointRadius,
                         pointHoverRadius: style.pointHoverRadius,
