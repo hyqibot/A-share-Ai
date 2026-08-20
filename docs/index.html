@@ -587,11 +587,12 @@
                     elements: {
                         line: {
                             tension: 0.4,
-                            borderWidth: 2
+                            borderWidth: 1
                         },
                         point: {
                             radius: 4,
-                            hoverRadius: 6
+                            hoverRadius: 6,
+                            hitRadius: 8
                         }
                     }
                 }
@@ -824,8 +825,10 @@
                         backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
                         fill: false,
                         tension: 0.4,
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        borderWidth: 1,
+                        pointRadius: showFullData ? 0 : 4,
+                        pointHoverRadius: 6,
+                        pointHitRadius: 8
                     };
                     
                     chart.data.datasets.push(dataset);
