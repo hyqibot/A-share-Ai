@@ -4,6 +4,10 @@
 
 接入自产龙虾iClaw，手机端一句话同时控制四大模型全自动交易。
 
+## 交易执行说明
+
+- **买入**：按总资产×仓位比例计算金额，并受「单轮最多使用可用现金一定比例」限制。
+- **卖出（模型自动 SELL 信号）**：按当前持仓**全部卖出**，不受可用现金上限影响（避免资金紧张时卖单被算成 0 股）。
 
 ## 功能特性
 
@@ -15,7 +19,7 @@
 
 🎯 策略进化：基于交易表现，AI模型能够不断优化自己的投资策略
 
-⏰ 秒级别实盘交易支持 - 接入实盘秒级精度交易
+⏰ 秒级别实盘交易支持 - 接入实盘秒级精度交易,需拥有合规通道
 
 🚀 服务部署与并行执行 - 部署生产服务 + 并行模型执行
 
@@ -70,14 +74,12 @@
 [![实时投资组合](https://img.shields.io/badge/📊_实时投资组合-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
 
 
-
 **安装及启动**
-
-   项目已打包成windows桌面exe软件，可直接运行，内测结束，2026.3月起正式商用，获取方法：前往https://hyqibot.com/card-shop.html 购服务卡即可获得软件，如有疑问可发送您的github地址（必需）+简短介绍到：hyqi@tradey.dpdns.org，更多信息，可点：https://www.hyqibot.com/  有永久免token费的龙虾iclaw赠送。
+    项目已打包成windows桌面exe，可直接运行，获取方法：前往https://hyqibot.com/card-shop.html 捐赠相应期限的服务卡即可获得，如需接入实盘需拥有合规通道并自行完成或有要求的相关报备。有疑问可发送您的github地址（必需）+简短介绍到：hyqi@tradey.dpdns.org，更多信息，可点：https://www.hyqibot.com/  有永久免token费的龙虾iclaw赠送。    
 
    启动方法很简单：傻瓜式，无需python基础
    下载Releases安装包，解压，将user_config.json.example重命名为user_config.json，填写参数
-   需要用到的参数有几类：1）真实交易账户的安装路径、账号，可接入专业交易api（另询官邮），兼容各大券商的QMT和同花顺交易；2）自选股票池通达信本地路径；3）deepseek等大模型api-key；4）licence：hyqibot
+   需要用到的参数有几类：1）真实交易账户需合规接入，比如机构自有通道或各大券商QMT；2）自选股票池通达信本地路径；3）deepseek等大模型api-key；4）licence：hyqibot
    填好参数保存，右键以管理员身份运行解压好的exe文件，图形界面上点击启动交易即可。
 
 ## 核心飞跃：真正的AI自我发现
@@ -214,7 +216,14 @@ A-share-Ai: Phantom Silver Quantitative AI Trading System for A-Shares
 
 An automated A-share trading system powered by four major domestic large language models (HYQi Phantom Silver Ultra-i, DeepSeek, Qwen, Doubao), supporting full-market stock selection and live trading.
 
-Key Features
+Integrates our in-house lobster iClaw: control all four models' fully automated trading from your phone with a single sentence.
+
+## Trade Execution
+
+- **Buy**: Size by total assets × position ratio, and cap spend at a configured share of available cash per cycle.
+- **Sell (model auto SELL)**: Sell the **entire current position**. Not limited by available-cash caps (so sells are not sized to 0 shares when cash is tight).
+
+## Key Features
 
 🎯 Let AI showcase its capabilities in the A-share market—multiple large language models make fully autonomous decisions and compete against each other across all A-share stocks!
 
@@ -224,7 +233,7 @@ Key Features
 
 🎯 Strategy Evolution: Based on trading performance, AI models continuously optimize their investment strategies.
 
-⏰ Second-level Live Trading Support - Connect to live trading with second-level precision.
+⏰ Second-level Live Trading Support - Connect to live trading with second-level precision. A compliant trading channel is required.
 
 🚀 Service Deployment & Parallel Execution - Deploy production services + parallel model execution.
 
@@ -232,13 +241,43 @@ Key Features
 
 🎯 Core Feature: 100% AI autonomous decision-making with zero human intervention. AI strategies self-discover, self-train, and self-evolve.
 
-🎯 Special Function: Real-time human intervention and interaction with AI during trading (optional), adapting to real-world scenarios of large-scale investments.
+🎯 Special Function: Optional real-time human intervention and interaction with AI during trading. Integrates our in-house lobster iClaw to take over that interaction and command all four AIs at once.
 
 🎯 Newly added asynchronous execution to improve system speed.
 
-🤖 4-Model Parallelism: Simultaneous operation of HYQi Phantom Silver Ultra-i, DeepSeek, Qwen, and Doubao to compare returns.📈 Full-Market Stock Selection: AI independently selects promising stocks from the entire market, with customizable stock pools (optional).💹 Real-Time Market Data: Integrates real-time A-share data for AI use in actual trading.💹 Historical Market + Financial Data: Integrates A-share historical market and financial data for AI analysis and training.🎯 Intelligent Trading: Generates buy/sell signals based on AI analysis and executes trades fully automatically.🌈 Multiple Strategies: Includes trend following, moving average strategies, technical indicator strategies, quantitative arbitrage strategies, etc.—fully selected and continuously evolved by AI.📊 Real-Time Monitoring: UI interface displays real-time profit curves and trading logs.🔒 Risk Control: Built-in position control and stop-loss mechanisms.
+🤖 **4-Model Parallelism**: HYQi Phantom Silver Ultra-i, DeepSeek, Qwen, and Doubao run together to compare returns
+📈 **Full-Market Stock Selection**: AI independently selects promising stocks from the entire market, with customizable stock pools (optional)
+💹 **Real-Time Market Data**: Integrates real-time A-share data for AI use and live trading
+💹 **Historical Market + Financial Data**: Integrates A-share historical market and financial data for AI analysis and training
+🎯 **Intelligent Trading**: Generates buy/sell signals based on AI analysis and executes trades fully automatically
+🌈 **Multiple Strategies**: Includes trend following, moving average strategies, technical indicator strategies, quantitative arbitrage strategies, and more—fully selected and continuously evolved by AI
+📊 **Real-Time Monitoring**: UI interface displays real-time profit curves and trading logs
+🔒 **Risk Control**: Built-in position control and stop-loss mechanisms
 
-📊 AI Stock Trading Competition Rankings, Real-Time Returns & Decision Logs, Real-Time Portfolio
+## 📱 iClaw DingTalk Setup
+
+Method 1 (deprecated): After enabling `config/dingtalk.json`, the app asked you to send `/status` once in a DingTalk private chat to bind. On success it wrote your account ID to `default_conversation_id`, then pushed each round's results to that chat (no manual personal ID).
+
+Method 2: Obtain `sender_id` via a test script or the DingTalk console and write it to `default_conversation_id` in `config/dingtalk.json`, along with the other required fields (see the example file). After launch, each round's results are pushed to that account, and DingTalk can remotely control all models in the project in real time.
+
+> **Stream connection**: Inbound messages use WebSocket Stream; outbound notices use the REST API (independent). If private-chat commands stop arriving for a long time while trade notices still work, logs will show `Stream 已断开，10s 后重连...`. The app reconnects automatically; no restart is required.
+
+## 💬 iClaw Chat and Natural-Language Trade Commands
+
+- **Chat (multi-model)**: Send `@model_name your question`. The bot calls that model and replies (chat only, no orders).
+  - Examples: `@幻银超i 今天市场怎么看？`, `@deepseek 解释一下市盈率`
+- **Natural-language AI trading**: Send `@iClaw your natural-language trade intent`. The bot uses the model named in your text to translate the intent into a JSON command, validates it, then runs the same `/buy` / `/sell` path.
+  - Example: `@iClaw 用幻银超i买入002961 1000股，价格26.9`
+- **Slash commands**:
+  - **Buy/sell**: `/buy [model] symbol qty [price]`, `/sell [model] symbol qty [price]`. Model name is optional. Examples: `/buy 000001 1000`, `/sell 幻银超i 000001 500 27.0`
+  - **Batch buy**: `/batch_buy [model] symbol:qty,symbol:qty,...`. Model name is optional (default model if omitted). Examples: `/batch_buy 000001:1000,000002:500` or `/batch_buy 幻银超i 000001:1000,000002:500`
+  - **Conditional orders**: `/condition [model] symbol condition buy/sell [qty]`. Model name is optional. Conditions: `price>n`, `price<n`, `price_between low high`. Examples: `/condition 000001 price>11 buy 1000` or `/condition 幻银超i 000001 price>11 buy 1000`. **Qty is optional**: if omitted, buys are sized from risk and available cash, sells are the full position. If the price is not met yet, the system keeps watching in the background on the trading-cycle interval and submits a market order when triggered (default TTL 6 hours). **Conditional monitoring runs in a separate task and does not block the main trading loop**. The bot returns a condition-order ID; **cancel** with `/cancel <id>` (e.g. `/cancel COND-1734567890-000001`).
+- **Full command list**: Send `/help` or `/h` in DingTalk.
+- **Launch a local app remotely**: Send `/runapp <alias or builtin name>`. The host tries to start a whitelisted desktop app.
+   - Aliases are configured in `user_config.json` under `APP_LAUNCH_CONFIG.aliases`, e.g. `"mytrader": "C:\\Users\\you\\Desktop\\MyTrader\\MyTrader.exe"`
+   - Canonical programs such as `notepad` and `calc` can be started with `/runapp notepad` (extend via `builtin_allow`)
+
+## 📊 AI Stock Trading Competition Rankings, Real-Time Returns & Decision Logs, Real-Time Portfolio
 
 [![Ai炒股大赛历史排行榜(基金运作)](https://img.shields.io/badge/📈_Ai炒股大赛历史排行榜(基金运作)-GitHub_Pages-blue?style=for-the-badge&logo=github)](https://hyqibot.github.io/A-share-Ai/reports/report.html)
 
@@ -249,20 +288,13 @@ Key Features
 [![实时投资组合](https://img.shields.io/badge/📊_实时投资组合-Portfolio-orange?style=for-the-badge&logo=pie-chart)](https://hyqibot.github.io/A-share-Ai/portfolio.html)
 
 
-Installation & Usage
+**Install & Launch**
+    The project ships as a Windows desktop EXE and can be run directly. Get it by donating for a service card of the matching term at https://hyqibot.com/card-shop.html. Live trading requires a compliant channel; complete any required filings yourself. Questions: send your GitHub URL (required) plus a short intro to hyqi@tradey.dpdns.org. More info: https://www.hyqibot.com/ . A permanent zero-token-fee lobster iClaw is included as a gift.
 
-The project is packaged as a desktop EXE application, which can be downloaded and run directly. A 3-month free closed beta is provided. Users whose feedback is adopted will receive professional technical support and long-term usage rights. Reservation email: hyqi@tradey.dpdns.org. Please Star the project (click the star icon in the upper right corner), then send your contact information, a brief introduction, and an explanation of your usage purpose. We will decide whether to arrange closed beta access based on your email content. If you are granted closed beta qualification, you will be notified by email within 3-5 working days.
-
-Launch is simple: No Python experience required (beginner-friendly).
-Download the installation package from Releases and unzip it.
-Rename user_config.json.example to user_config.json and fill in the parameters.
-Required parameters include:
-Installation path and account of your real trading account. Professional trading APIs are supported (inquire via official email), compatible with QMT and Tonghuashun trading platforms of major securities firms.
-Local path of your custom stock pool (Tongdaxin format).
-API keys for large models such as DeepSeek.
-License: hyqibot
-
-Save the filled parameters, right-click to run the unzipped EXE file as an administrator, and click "Start Trading" on the GUI.
+   Launch is simple: no Python experience required.
+   Download the Releases package, unzip it, rename `user_config.json.example` to `user_config.json`, and fill in the parameters.
+   Parameter groups: 1) a compliant live-trading hookup, e.g. an institutional channel or broker QMT; 2) local Tongdaxin path for your custom stock pool; 3) API keys for DeepSeek and other models; 4) licence: hyqibot
+   Save, right-click the unzipped EXE and run as administrator, then click Start Trading in the UI.
 
 
 Core Leap: True AI Self-Discovery
