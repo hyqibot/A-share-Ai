@@ -4,11 +4,6 @@
 
 接入自产龙虾iClaw，手机端一句话同时控制四大模型全自动交易。
 
-## 交易执行说明
-
-- **买入**：按总资产×仓位比例计算金额，并受「单轮最多使用可用现金一定比例」限制。
-- **卖出（模型自动 SELL 信号）**：按当前持仓**全部卖出**，不受可用现金上限影响（避免资金紧张时卖单被算成 0 股）。
-
 ## 功能特性
 
 🎯 让AI在A股市场中一展身手，让多个大语言模型在A股全市场股票中完全自主决策、同台竞技！
@@ -218,10 +213,6 @@ An automated A-share trading system powered by four major domestic large languag
 
 Integrates our in-house lobster iClaw: control all four models' fully automated trading from your phone with a single sentence.
 
-## Trade Execution
-
-- **Buy**: Size by total assets × position ratio, and cap spend at a configured share of available cash per cycle.
-- **Sell (model auto SELL)**: Sell the **entire current position**. Not limited by available-cash caps (so sells are not sized to 0 shares when cash is tight).
 
 ## Key Features
 
