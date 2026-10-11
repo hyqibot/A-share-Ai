@@ -70,7 +70,7 @@
 
 
 **安装及启动**
-    项目已打包成windows桌面exe，可直接运行，获取方法：前往https://hyqibot.com/card-shop.html 捐赠相应期限的服务卡即可获得，如需接入实盘需拥有合规通道并自行完成或有要求的相关报备。有疑问可发送您的github地址（必需）+简短介绍到：hyqi@tradey.dpdns.org，更多信息，可点：https://www.hyqibot.com/  有永久免token费的龙虾iclaw赠送。    
+    项目已打包成windows桌面exe，可直接运行，获取方法：前往https://hyqibot.com/card-shop.html 捐赠相应期限的服务卡*2(需2张服务卡，项目能力不断加强）即可获得，如需接入实盘需拥有合规通道并自行完成或有要求的相关报备。有疑问可发送您的github地址（必需）+简短介绍到：hyqi@tradey.dpdns.org，更多信息，可点：https://www.hyqibot.com/  有永久免token费的龙虾iclaw赠送。    
 
    启动方法很简单：傻瓜式，无需python基础
    下载Releases安装包，解压，将user_config.json.example重命名为user_config.json，填写参数
