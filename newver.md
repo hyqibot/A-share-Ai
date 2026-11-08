@@ -9,7 +9,7 @@
             amount = self.risk_manager.calculate_sell_amount(sellable_position) 
             #amount = self.risk_manager.calculate_sell_amount(current_position)
 
-2、只点停止不点X关闭窗口重启，会导致上一轮的用户交互等待循环daemon进程残留，造成两个用户交易进程并行继续运行。解决方法：每次重启都关闭窗口再重新启动，或改下面代码：
+2、只点停止不点X关闭窗口重启，会导致上一轮的用户交互等待循环daemon进程残留，造成两个用户交互进程同时运行。解决方法：每次重启都关闭窗口再重新启动，或改下面代码：
 
     #解决：点停止后重启接续，旧daemon 线程阻塞在 interaction_event.wait(timeout=remaining_time)循环持续，会用旧循环的start_time导致额外新增轮次交易，两个 daemon 线程并行继续。
         ev = getattr(self, '_current_interaction_event', None)   # ← 新增
