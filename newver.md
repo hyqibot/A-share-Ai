@@ -1,4 +1,22 @@
-版本更新日志 - 2026-10-08,版本:v2.02
+版本更新日志 - 2026-11-08,版本:v2.10
+
+1、_execute_signal 的 SELL 以及execute_direct_trade 里 SELL 分支里添加 ：模型账持仓扣除当天买入冻结（T+1 不可卖）
+
+        if signal.action == "SELL":
+            # 模型账持仓扣除当天买入冻结（T+1 不可卖），只对可卖部分计算意图 V
+            today_frozen = self.today_buy_frozen.get(self._normalize_stock_code(signal.symbol) or signal.symbol, 0)
+            sellable_position = max(0, current_position - today_frozen)
+            amount = self.risk_manager.calculate_sell_amount(sellable_position) 
+            #amount = self.risk_manager.calculate_sell_amount(current_position)
+
+2、只点停止不点X关闭窗口重启，会导致上一轮的用户交互等待循环daemon进程残留，造成两个用户交易进程并行继续运行。解决方法：每次重启都关闭窗口再重新启动，或改下面代码：
+
+    #解决：点停止后重启接续，旧daemon 线程阻塞在 interaction_event.wait(timeout=remaining_time)循环持续，会用旧循环的start_time导致额外新增轮次交易，两个 daemon 线程并行继续。
+        ev = getattr(self, '_current_interaction_event', None)   # ← 新增
+        if ev:                                                    # ← 新增
+            ev.set()                                              # ← 新增
+			
+版本更新日志 - 2026-10-08,版本:v2.03
 
 # 策略自进化修复
 
